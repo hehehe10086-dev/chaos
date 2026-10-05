@@ -3,7 +3,7 @@
 ## Current status
 
 M1 sync sandbox is committed on branch `feat/m1-sync` (not pushed). Verified by Claude locally with the in-memory store: create room → 4-letter code → second player joins → shared counter + messages sync via polling within ~2s; refresh keeps identity; 20 concurrent increments lose nothing; 9 vitest tests pass.
-NOT yet verified: Yuqi's own two-window test (blocked: dev server was not running — Yuqi must run `npm run dev` and keep that terminal open); `server/store/redis.js` against a real Upstash database; M1 on Vercel; real phone.
+Yuqi verified locally on 2026-10-05 (normal + incognito window, in-memory store). NOT yet verified: `server/store/redis.js` against a real Upstash database; M1 on Vercel; real phone.
 `main` = scaffold only, live at https://chaos-ten-hazel.vercel.app/ (`/api/health` OK).
 
 ## Decisions
@@ -20,11 +20,10 @@ NOT yet verified: Yuqi's own two-window test (blocked: dev server was not runnin
 
 ## Next (by priority)
 
-1. Yuqi tests M1 locally: `npm run dev`, normal window + incognito window
-2. Yuqi creates Upstash Redis via Vercel Storage (us-east-1, Free, no read regions), copies URL/TOKEN into local `.env`; re-test locally with Redis
-3. Push `feat/m1-sync`, open PR, test on the Vercel Preview URL with laptop + real phone, merge
-4. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
-5. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
+1. Yuqi creates Upstash Redis via Vercel Storage (us-east-1, Free, no read regions), copies URL/TOKEN into local `.env`; re-test locally with Redis
+2. PR is open for `feat/m1-sync` — do NOT merge until Redis is configured (without it the API returns 500 on Vercel); test on the Vercel Preview URL with laptop + real phone, merge
+3. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
+4. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
 
 ## Milestones
 

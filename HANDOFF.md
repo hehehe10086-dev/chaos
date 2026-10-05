@@ -38,7 +38,7 @@
 
 ## 4. 正在做、还没做完的事（最重要）
 
-**M1 处于"本地已验证、等接 Redis"阶段。** 2026-10-05 Yuqi 已在本地用正常窗口 + 无痕窗口验证通过（内存存储）。`feat/m1-sync` 已 push 并开 PR；**在 Redis 配好之前不要合并**——没有 Redis 时 `server/store/index.js` 在 Vercel 上会抛错，API 返回 500，会让 main 不可玩。 具体顺序：
+**M1 处于"本地（含真实 Redis）已验证、等线上验证"阶段。** Redis 已创建并连到 Vercel 项目（Upstash `upstash-kv-emerald-car`，经 Vercel Storage 创建），本地 `.env` 已配置。已修复的 bug：`automaticDeserialization:false` 时 `hmget` 返回数组 `[v, s]` 而不是对象，导致所有读取返回 null（"Room not found"）；CAS 重试改为 10 次 + 指数退避（5 次时 20 个并发写有 6 个 409）。下面第 2、3 步已完成，从第 4 步继续。 2026-10-05 Yuqi 已在本地用正常窗口 + 无痕窗口验证通过（内存存储）。`feat/m1-sync` 已 push 并开 PR；**在 Redis 配好之前不要合并**——没有 Redis 时 `server/store/index.js` 在 Vercel 上会抛错，API 返回 500，会让 main 不可玩。 具体顺序：
 
 1. **Yuqi 本地双窗口验证（未验证）**。上一次 Yuqi 打开 http://localhost:5173 得到 `ERR_CONNECTION_REFUSED`，原因是 dev server 没在运行（不是代码问题）。需要 Yuqi 在终端运行 `npm run dev` 并**保持该终端开着**，然后：正常窗口建房 → 无痕窗口（Ctrl+Shift+N）用房间码加入 → 两边点 +1、发消息，2 秒内同步 → 两边秘密数字不同且互相看不到 → 刷新后身份不变 → "Copy invite link" 在新无痕窗口打开会出现加入表单。
 2. **建 Upstash Redis（Yuqi 操作，需要他的账号）**：Vercel 项目 → Storage → Create Database → Upstash for Redis；区域 **Washington, D.C. (us-east-1)**；Free；**不要加 read region**（只读副本会破坏读己所写）；连接到 Production/Preview/Development 三个环境。Vercel 会注入 `KV_REST_API_URL`、`KV_REST_API_TOKEN`。本地把 `.env.example` 复制成 `.env`，填 `UPSTASH_REDIS_REST_URL`、`UPSTASH_REDIS_REST_TOKEN`（或 KV_ 名字，两者都支持）。**不要让 Yuqi 把 token 贴到聊天里。**

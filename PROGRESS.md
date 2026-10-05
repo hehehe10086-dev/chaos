@@ -1,7 +1,14 @@
 # Progress
 
 ## Current status
-Design phase. No game code yet. Plan agreed: Upstash Redis + polling, LLM behind an adapter (Claude Haiku 4.5 candidate, to be compared against Gemini Flash in W1).
+Design phase. No game code yet.
+
+## Decisions
+- State store: Upstash Redis (single region, us-east-1) + polling; conditional writes via Lua on `version`
+- LLM: behind an adapter (`server/llm/client.js`); Claude Haiku 4.5 candidate, compared against Gemini Flash in W1
+- Language: JavaScript (+ JSDoc where types help)
+- First story: B-59 submarine, Cuban Missile Crisis, Oct 1962
+- AI voting: each AI seat has a numeric `lean` set by rules; each round an LLM structured judgment may shift it by at most ±1; the vote is a threshold on `lean`
 
 ## In progress
 - Yuqi — branch `chore/repo-setup`: `.gitattributes`, `CLAUDE.md`, `PROGRESS.md`
@@ -20,12 +27,10 @@ Design phase. No game code yet. Plan agreed: Upstash Redis + polling, LLM behind
 - W4 (10/25–10/30): playtests, polish, freeze 10/27, submit 10/29
 
 ## Open questions / known issues
-- AI voting: rule-based initial lean + LLM-judged ±1 per round, or fixed by secret objective?
 - Split of work between Yuqi and teammate (backend vs frontend)
-- JavaScript (+JSDoc) or TypeScript?
 - LLM billing account and daily budget cap
-- First story: B-59 (1962)?
 - Verify whether Upstash archives inactive free databases
 
 ## Log
+- 2026-10-04 Yuqi — decided JavaScript, B-59 as first story, lean-based AI voting.
 - 2026-10-04 Yuqi — design review & plan; added repo collaboration files.

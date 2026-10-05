@@ -24,6 +24,7 @@ _To be filled in once the project is scaffolded (dev / test / build / deploy)._
 - No background timers: rounds advance lazily when a request sees an expired deadline.
 
 ## Code conventions
+- JavaScript (ES modules), JSDoc for shared data shapes. No TypeScript.
 - `api/` holds thin Vercel handlers only; logic lives in `server/` (files in `api/` become functions).
 - Game engine is pure functions with tests.
 - Stories are data files in `stories/`, not code.

@@ -9,6 +9,7 @@ Multiplayer historical role-play party game for the Handshake AI Skills Studio M
 - `docs/spec.md` — game rules & story script (to be written)
 - `docs/api.md` — API contract: actions and per-seat view JSON (to be written)
 - `docs/art-list.md` — image asset list for GPT generation
+- `HANDOFF.md` — full handoff for a new teammate or tool (state, decisions, pitfalls, next tasks).
 - `PROGRESS.md` — current status & handoff log. **Read it first; update it at the end of every work session.**
 
 ## Commands
@@ -48,6 +49,7 @@ Multiplayer historical role-play party game for the Handshake AI Skills Studio M
 
 - `main` is always playable. Work on branches (`feat/…`, `fix/…`, `chore/…`, `docs/…`) and merge via Pull Request.
 - One PR = one thing. Test on the Vercel Preview URL before merging.
+- Merge with "Create a merge commit", not squash: Vercel Hobby only deploys commits authored by the project owner (Yuqi).
 - Commit after each small working step. Message format: `feat: …`, `fix: …`, `docs: …`, `chore: …`.
 - Line endings are enforced by `.gitattributes` (LF).
 

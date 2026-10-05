@@ -2,7 +2,9 @@
 
 ## Current status
 
-Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game code yet.
+M1 sync sandbox is committed on branch `feat/m1-sync` (not pushed). Verified by Claude locally with the in-memory store: create room → 4-letter code → second player joins → shared counter + messages sync via polling within ~2s; refresh keeps identity; 20 concurrent increments lose nothing; 9 vitest tests pass.
+Yuqi verified locally on 2026-10-05 with the in-memory store and then with real Upstash Redis (rooms survive a dev-server restart). NOT yet verified: M1 on Vercel; real phone.
+`main` = scaffold only, live at https://chaos-ten-hazel.vercel.app/ (`/api/health` OK).
 
 ## Decisions
 
@@ -14,14 +16,13 @@ Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game co
 
 ## In progress
 
-- Yuqi — branch `chore/scaffold`: Vite + React + Tailwind + `/api` dev server
+- Yuqi — branch `feat/m1-sync`: room create/join, seatToken auth, CAS writes, polling, per-player view
 
 ## Next (by priority)
 
-1. Connect repo to Vercel, confirm `/api/health` works on the public URL
+1. PR for `feat/m1-sync` is open and Redis is connected to the Vercel project: redeploy the Preview, test with laptop + real phone, then merge
 2. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
-3. M1 sync prototype: create room → 4-letter code → second device joins → shared state updates ≤2s; deploy to Vercel and test on a real phone
-4. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
+3. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
 
 ## Milestones
 
@@ -38,6 +39,10 @@ Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game co
 
 ## Log
 
+- 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.
+- 2026-10-05 Claude — wrote HANDOFF.md (handoff to another AI tool).
+- 2026-10-05 Yuqi — M1 sync sandbox: /api/room, /api/state, /api/action; memory + Redis stores; 9 tests.
+- 2026-10-04 Yuqi — deployed scaffold to Vercel.
 - 2026-10-04 Yuqi — scaffold: Vite 8, React 19, Tailwind 4, Prettier; local `/api` via Vite plugin.
 - 2026-10-04 Yuqi — decided JavaScript, B-59 as first story, lean-based AI voting.
 - 2026-10-04 Yuqi — design review & plan; added repo collaboration files.

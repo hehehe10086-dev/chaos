@@ -2,7 +2,9 @@
 
 ## Current status
 
-M1 sync sandbox works locally (in-memory store): create room → 4-letter code → others join by code/link → shared counter + messages sync via polling. Deployed scaffold at https://chaos-ten-hazel.vercel.app/ (M1 not deployed yet — needs Redis).
+M1 sync sandbox is committed on branch `feat/m1-sync` (not pushed). Verified by Claude locally with the in-memory store: create room → 4-letter code → second player joins → shared counter + messages sync via polling within ~2s; refresh keeps identity; 20 concurrent increments lose nothing; 9 vitest tests pass.
+NOT yet verified: Yuqi's own two-window test (blocked: dev server was not running — Yuqi must run `npm run dev` and keep that terminal open); `server/store/redis.js` against a real Upstash database; M1 on Vercel; real phone.
+`main` = scaffold only, live at https://chaos-ten-hazel.vercel.app/ (`/api/health` OK).
 
 ## Decisions
 
@@ -18,10 +20,11 @@ M1 sync sandbox works locally (in-memory store): create room → 4-letter code �
 
 ## Next (by priority)
 
-1. Create Upstash Redis (us-east-1), set env vars on Vercel + local `.env`, test M1 online with laptop + phone
-2. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
-3. M1 sync prototype: create room → 4-letter code → second device joins → shared state updates ≤2s; deploy to Vercel and test on a real phone
-4. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
+1. Yuqi tests M1 locally: `npm run dev`, normal window + incognito window
+2. Yuqi creates Upstash Redis via Vercel Storage (us-east-1, Free, no read regions), copies URL/TOKEN into local `.env`; re-test locally with Redis
+3. Push `feat/m1-sync`, open PR, test on the Vercel Preview URL with laptop + real phone, merge
+4. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
+5. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
 
 ## Milestones
 
@@ -38,6 +41,7 @@ M1 sync sandbox works locally (in-memory store): create room → 4-letter code �
 
 ## Log
 
+- 2026-10-05 Claude — wrote HANDOFF.md (handoff to another AI tool).
 - 2026-10-05 Yuqi — M1 sync sandbox: /api/room, /api/state, /api/action; memory + Redis stores; 9 tests.
 - 2026-10-04 Yuqi — deployed scaffold to Vercel.
 - 2026-10-04 Yuqi — scaffold: Vite 8, React 19, Tailwind 4, Prettier; local `/api` via Vite plugin.

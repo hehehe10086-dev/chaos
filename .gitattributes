@@ -1,0 +1,18 @@
+# Store all text files with LF line endings, regardless of OS (Windows/Mac).
+* text=auto eol=lf
+
+# Windows-only scripts need CRLF
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# Binary assets: never touch line endings, never diff as text
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.mp3  binary
+*.ogg  binary

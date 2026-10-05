@@ -6,7 +6,7 @@ import { GameError, applyAction, createInitialState } from './engine/applyAction
 import { viewFor } from './engine/view.js';
 import { getStore } from './store/index.js';
 
-const MAX_CAS_RETRIES = 5;
+const MAX_CAS_RETRIES = 10;
 
 export async function loadRoom(code) {
   const room = await getStore().get(code);
@@ -35,8 +35,10 @@ export async function mutateRoom(code, update) {
     if (await store.cas(code, room.version, next)) {
       return { version: room.version + 1, state: next };
     }
-    // Lost the race: wait a little (random, so retries don't collide again) and retry.
-    await new Promise((r) => setTimeout(r, 20 + randomInt(80)));
+    // Lost the race: back off exponentially (capped), with random jitter so the
+    // retrying requests spread out instead of colliding again.
+    const maxWait = Math.min(1000, 25 * 2 ** attempt);
+    await new Promise((r) => setTimeout(r, randomInt(Math.floor(maxWait / 2), maxWait + 1)));
   }
   throw new GameError('The room is busy, please try again', 409);
 }

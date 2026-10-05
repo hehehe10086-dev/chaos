@@ -28,7 +28,9 @@ export function createRedisStore() {
 
   return {
     async get(code) {
-      const { v, s } = (await redis.hmget(key(code), 'v', 's')) ?? {};
+      // With automaticDeserialization off, hmget returns the raw array [v, s]
+      // ([null, null] if the key doesn't exist), not an object.
+      const [v, s] = (await redis.hmget(key(code), 'v', 's')) ?? [];
       if (v == null || s == null) return null;
       return { version: Number(v), state: JSON.parse(s) };
     },

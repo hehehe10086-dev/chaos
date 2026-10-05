@@ -2,7 +2,7 @@
 
 ## Current status
 
-Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game code yet.
+M1 sync sandbox works locally (in-memory store): create room → 4-letter code → others join by code/link → shared counter + messages sync via polling. Deployed scaffold at https://chaos-ten-hazel.vercel.app/ (M1 not deployed yet — needs Redis).
 
 ## Decisions
 
@@ -14,11 +14,11 @@ Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game co
 
 ## In progress
 
-- Yuqi — branch `chore/scaffold`: Vite + React + Tailwind + `/api` dev server
+- Yuqi — branch `feat/m1-sync`: room create/join, seatToken auth, CAS writes, polling, per-player view
 
 ## Next (by priority)
 
-1. Connect repo to Vercel, confirm `/api/health` works on the public URL
+1. Create Upstash Redis (us-east-1), set env vars on Vercel + local `.env`, test M1 online with laptop + phone
 2. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
 3. M1 sync prototype: create room → 4-letter code → second device joins → shared state updates ≤2s; deploy to Vercel and test on a real phone
 4. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
@@ -38,6 +38,8 @@ Scaffold only: Vite + React + Tailwind page that calls `/api/health`. No game co
 
 ## Log
 
+- 2026-10-05 Yuqi — M1 sync sandbox: /api/room, /api/state, /api/action; memory + Redis stores; 9 tests.
+- 2026-10-04 Yuqi — deployed scaffold to Vercel.
 - 2026-10-04 Yuqi — scaffold: Vite 8, React 19, Tailwind 4, Prettier; local `/api` via Vite plugin.
 - 2026-10-04 Yuqi — decided JavaScript, B-59 as first story, lean-based AI voting.
 - 2026-10-04 Yuqi — design review & plan; added repo collaboration files.

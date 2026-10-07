@@ -85,7 +85,7 @@ function RoomView({ code, session, onLostSession }) {
       try {
         const res = await sendAction(code, session.token, action);
         setView(res.view);
-        return { ok: true };
+        return { ok: true, data: res }; // data: e.g. { suggestions } for "suggest"
       } catch (err) {
         return { ok: false, error: err };
       }

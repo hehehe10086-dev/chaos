@@ -4,11 +4,17 @@
 
 import { randomInt } from 'node:crypto';
 import { waitUntil } from '@vercel/functions';
-import { rewriteLine, takeoverRecap } from './ai/tasks.js';
+import { rewriteLine, suggestLines, takeoverRecap } from './ai/tasks.js';
 import { runWorker } from './ai/worker.js';
 import { hashToken, newId, newRoomCode, newToken } from './auth.js';
 import { readyTask } from './engine/agents.js';
-import { applyAction, checkTakeover, tooSoon } from './engine/applyAction.js';
+import {
+  applyAction,
+  assistOf,
+  checkSuggest,
+  checkTakeover,
+  tooSoon,
+} from './engine/applyAction.js';
 import { GameError } from './engine/errors.js';
 import { advance, gameTime } from './engine/game.js';
 import { cleanText, createRoomState, roleOfPlayer } from './engine/state.js';
@@ -101,6 +107,8 @@ async function prepareSay(code, token, action, now) {
   const { state } = await loadRoom(code);
   const player = authenticate(state, token);
   if (tooSoon(player, now)) throw new GameError('Slow down a little', 429);
+  // A line picked from the Tab suggestions: already in era voice; the engine looks it up by index.
+  if (action.suggestion != null) return { type: 'say', suggestion: action.suggestion };
   const text = cleanText(action.text);
   const roleId = state.phase === 'playing' ? roleOfPlayer(state.game, player.id) : null;
   if (!roleId) return { type: 'say', text };
@@ -122,11 +130,27 @@ async function prepareTakeover(code, token, action, now) {
   return { type: 'takeover', roleId, recap };
 }
 
+/** Tab assist: writes suggested lines before the state update, which stores them for "say". */
+async function prepareSuggest(code, token, action, now) {
+  const room = await loadRoom(code);
+  const player = authenticate(room.state, token);
+  const scenario = getScenario(room.state.scenarioId);
+  const state = advance(room.state, scenario, now, latestPresence(room.presence));
+  checkSuggest(state, player, now); // fail fast: no LLM call for a refused request
+  const typed = String(action.text ?? '').trim();
+  const intent = typed ? cleanText(typed) : null;
+  const roleId = roleOfPlayer(state.game, player.id);
+  const asked = assistOf(state, player)?.count ?? 0; // asking again shows other lines
+  const lines = await suggestLines(state, scenario, roleId, intent, now, asked);
+  return { type: 'suggest', lines, intent };
+}
+
 // Slow work (LLM) done before the compare-and-set loop. Each rebuilds the action from scratch,
-// so a client can never smuggle in server-only fields (a rewrite's original, a recap).
+// so a client can never smuggle in server-only fields (a rewrite's original, a recap, lines).
 const PREPARE = new Map([
   ['say', prepareSay],
   ['takeover', prepareTakeover],
+  ['suggest', prepareSuggest],
 ]);
 
 export async function performAction(code, token, action, options = {}) {
@@ -152,5 +176,7 @@ export async function performAction(code, token, action, options = {}) {
     });
   });
   kickWorker(code, room.state, now, options);
-  return { view: view(room, playerId, now) };
+  const result = { view: view(room, playerId, now) };
+  if (action.type === 'suggest') result.suggestions = action.lines; // only to the one who asked
+  return result;
 }

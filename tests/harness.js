@@ -43,9 +43,13 @@ export function harness({ timeScale = TIME_SCALE, seed = 'test-seed' } = {}) {
       return res;
     },
     async act(code, token, action) {
+      return (await this.actRaw(code, token, action)).view;
+    },
+    /** The whole response, e.g. { view, suggestions } for "suggest". */
+    async actRaw(code, token, action) {
       const res = await performAction(code, token, action, options());
       await settle();
-      return res.view;
+      return res;
     },
     async poll(code, token) {
       const res = await pollRoom(code, token, null, options());

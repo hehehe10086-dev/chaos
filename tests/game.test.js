@@ -1,6 +1,8 @@
 // Game rules and hidden information, through the real room API.
 
 import { beforeEach, describe, expect, it } from 'vitest';
+import { mockRewrite } from '../server/ai/mockStyle.js';
+import { getScenario } from '../server/scenarios.js';
 import { harness, resetStore } from './harness.js';
 
 beforeEach(resetStore);
@@ -72,6 +74,22 @@ describe('hidden information', () => {
     expect(antonyJson).not.toMatch(/tokenHash|traits|intelligence|pending/);
     expect(JSON.stringify(calpurnia)).toMatch(/Caesar lay bleeding/); // ...which she does see
     expect(antony.game.myRole.facts).toEqual([]);
+  });
+
+  it('accepts a line whose era-voice rewrite is longer than the 200-character input limit', async () => {
+    const { h, code, a } = await lobbyOfTwo();
+    await h.act(code, a.token, { type: 'pickRole', roleId: 'caesar' });
+    await h.act(code, a.token, { type: 'start' });
+    // Find a 190-character line that the mock scribe makes longer than 200 characters.
+    const scenario = getScenario();
+    const caesar = scenario.roleById.get('caesar');
+    const text = Array.from({ length: 40 }, (_, k) => `${'we march at dawn and '.repeat(9)}${k}`)
+      .map((line) => line.slice(0, 190))
+      .find((line) => mockRewrite(scenario, caesar, line).length > 200);
+    const view = await h.act(code, a.token, { type: 'say', text });
+    const said = view.messages.at(-1);
+    expect(said.original).toBe(text);
+    expect(said.text.length).toBeGreaterThan(200);
   });
 
   it('shows what a player typed only to that player', async () => {

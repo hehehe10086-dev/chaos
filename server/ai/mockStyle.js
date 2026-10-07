@@ -72,7 +72,8 @@ export function leadingVocative(scenario, text) {
   return role?.id ?? null;
 }
 
-export function mockRewrite(scenario, role, text) {
+/** `variant` > 0 picks other openers/closers, for several phrasings of one line (Tab assist). */
+export function mockRewrite(scenario, role, text, variant = 0) {
   const style = scenario.meta.mockStyle;
   let out = text.replace(CRUDE, 'cursed').replace(NET_SPEAK, '').trim() || text;
   for (const [from, to] of style.replacements) {
@@ -84,7 +85,7 @@ export function mockRewrite(scenario, role, text) {
   );
   if (!/[.!?…]$/.test(out)) out += '.';
 
-  const h = hash32(`${role.id}:${text}`);
+  const h = hash32(variant ? `${role.id}:${text}:${variant}` : `${role.id}:${text}`);
   const opener = style.openers[h % style.openers.length];
   const closer = style.closers[(h >>> 8) % style.closers.length];
   if (closer) out = out.replace(/([.!?…])$/, `${closer}$1`);

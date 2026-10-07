@@ -28,6 +28,19 @@ export function cleanText(text) {
   return clean;
 }
 
+/**
+ * Normalizes text the server wrote (an era-voice rewrite, a suggested line). Unlike cleanText it
+ * never rejects a long line: the 200-character limit is for what players type, and a rewrite
+ * may come out longer than its input.
+ */
+export function cleanLine(text, max = 400) {
+  const clean = String(text ?? '')
+    .trim()
+    .replace(/\s+/g, ' ');
+  if (!clean) throw new GameError('Message is empty');
+  return clean.slice(0, max);
+}
+
 /** @param {{code: string, now: number, scenarioId: string, seed: string}} params */
 export function createRoomState({ code, now, scenarioId, seed }) {
   return {

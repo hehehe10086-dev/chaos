@@ -9,6 +9,7 @@ import { agentPrompt, decisionPrompt } from '../prompts/agent.js';
 import { deathPoemPrompt, epiloguePrompt } from '../prompts/epilogue.js';
 import { recapPrompt } from '../prompts/recap.js';
 import { rewritePrompt } from '../prompts/rewrite.js';
+import { suggestPrompt } from '../prompts/suggest.js';
 import { leadingVocative, lowerFirst, mockRewrite, opensWithAddress } from './mockStyle.js';
 import { parsePoem, tidyLine, tidyParagraph } from './text.js';
 
@@ -130,6 +131,51 @@ export async function aiDecision(state, scenario, task, now) {
   } catch (error) {
     warn('decision', error);
     return { optionId: decision.historicalOptionId, line: '' };
+  }
+}
+
+/**
+ * Tab assist without the LLM: three of the role's scripted lines (`salt` = how many times the
+ * player has asked, so asking again shows others), or mock era-voice phrasings of an intention.
+ */
+export function mockSuggestions(state, scenario, roleId, intent, salt = 0) {
+  const role = scenario.roleById.get(roleId);
+  const lines = intent
+    ? [0, 1, 2].map((variant) => mockRewrite(scenario, role, intent, variant))
+    : shuffled(state.game.seed, `suggest:${roleId}:${salt}`, role.sampleLines).slice(0, 3);
+  return [...new Set(lines.map((line) => tidyLine(line, { maxChars: 220 })))];
+}
+
+const SuggestSchema = z.object({ lines: z.array(z.string()).min(1).max(6) });
+
+/** Up to three lines the player could say next (or ways to say `intent`). Fallback: the mock. */
+export async function suggestLines(state, scenario, roleId, intent, now, salt = 0) {
+  const fallback = () => mockSuggestions(state, scenario, roleId, intent, salt);
+  try {
+    const game = state.game;
+    const { system, messages } = suggestPrompt(
+      state,
+      scenario,
+      roleId,
+      intent,
+      currentAct(scenario, game),
+      gameTime(game, now),
+    );
+    const out = await completeJson({
+      system,
+      messages,
+      tier: 'fast',
+      maxTokens: 300,
+      schema: SuggestSchema,
+      mock: () => ({ lines: fallback() }),
+    });
+    const lines = [...new Set(out.lines.map((line) => tidyLine(line, { maxChars: 220 })))]
+      .filter(Boolean)
+      .slice(0, 3);
+    return lines.length ? lines : fallback();
+  } catch (error) {
+    warn('suggestions', error);
+    return fallback();
   }
 }
 

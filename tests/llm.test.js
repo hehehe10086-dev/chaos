@@ -13,7 +13,8 @@ vi.mock('../server/llm/anthropic.js', () => ({
 }));
 
 const { complete, completeJson, llmConfig } = await import('../server/llm/index.js');
-const { aiDecision, rewriteLine, takeoverRecap } = await import('../server/ai/tasks.js');
+const { aiDecision, rewriteLine, suggestLines, takeoverRecap } =
+  await import('../server/ai/tasks.js');
 const { getScenario } = await import('../server/scenarios.js');
 const { tidyLine, tidyParagraph } = await import('../server/ai/text.js');
 const { createMemoryStore } = await import('../server/store/memory.js');
@@ -192,6 +193,30 @@ describe('timeouts, caps and fallbacks', () => {
       secret: scenario.roleById.get('antony').secret,
       goal: scenario.roleById.get('antony').goal,
     });
+  });
+
+  it('suggestions: up to three tidy, distinct lines from the model, or scripted ones', async () => {
+    useFakeAnthropic();
+    const scenario = getScenario();
+    const state = {
+      messages: [],
+      game: { seed: 's', timeScale: 1, startedAt: 0, pausedMs: 0, acts: [{ id: 'dawn' }] },
+    };
+    fake.reply = async () =>
+      '{"lines": ["Brutus: Stay, friend.", "Stay, friend.", "\\"Rome waits.\\"", "One more.", "Too many."]}';
+    expect(await suggestLines(state, scenario, 'antony', null, 5000)).toEqual([
+      'Stay, friend.',
+      'Rome waits.',
+      'One more.',
+    ]);
+
+    fake.reply = async () => {
+      throw new Error('provider down');
+    };
+    const scripted = await suggestLines(state, scenario, 'antony', null, 5000);
+    expect(scripted).toHaveLength(3);
+    const samples = scenario.roleById.get('antony').sampleLines;
+    for (const line of scripted) expect(samples.some((s) => s.startsWith(line))).toBe(true);
   });
 
   it('keeps the quotes and colons that belong to a line', () => {

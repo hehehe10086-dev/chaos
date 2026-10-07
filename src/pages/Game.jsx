@@ -146,6 +146,15 @@ export default function Game({ view, receivedAt, act, connection }) {
             }
             onSend={(text) => act({ type: 'say', text })}
             busyHint="The scribe is writing…"
+            assist={
+              myRole && {
+                request: async (text) => {
+                  const result = await act({ type: 'suggest', text });
+                  return result.ok ? { ok: true, lines: result.data.suggestions } : result;
+                },
+                send: (suggestion) => act({ type: 'say', suggestion }),
+              }
+            }
             hint={
               connection ??
               (myRole ? (

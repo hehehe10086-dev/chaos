@@ -4,7 +4,14 @@
 import * as agents from './agents.js';
 import { GameError } from './errors.js';
 import { gameTime, resolveDecision, startGame } from './game.js';
-import { addMessage, cleanName, cleanText, requirePlayer, roleOfPlayer } from './state.js';
+import {
+  addMessage,
+  cleanLine,
+  cleanName,
+  cleanText,
+  requirePlayer,
+  roleOfPlayer,
+} from './state.js';
 
 /** Minimum real time between two messages from the same player (anti-spam). */
 export const SAY_COOLDOWN_MS = 1500;
@@ -36,6 +43,30 @@ export function checkTakeover(state, scenario, playerId, roleId) {
   if (game.openDecisions.some((d) => d.roleId === roleId)) {
     throw new GameError(`${role.shortName} is making a decision — try again in a moment`, 409);
   }
+}
+
+/** Tab assist: minimum real time between two suggestion requests, and a per-game cap (LLM spend). */
+export const SUGGEST_COOLDOWN_MS = 3000;
+export const MAX_SUGGESTIONS = 30;
+
+/** This game's suggestion record for a player, or null (a new game starts a new record). */
+export function assistOf(state, player) {
+  return player.assist?.gameId === state.game?.id ? player.assist : null;
+}
+
+/** Throws unless this player may ask for suggested lines now. Also run before the LLM call. */
+export function checkSuggest(state, player, now) {
+  if (state.phase !== 'playing') throw new GameError('Suggestions are for the game itself', 409);
+  if (!roleOfPlayer(state.game, player.id)) {
+    throw new GameError('Take over a character first', 403);
+  }
+  const assist = assistOf(state, player);
+  if (!assist) return;
+  if (assist.count >= MAX_SUGGESTIONS) {
+    throw new GameError('The scribe needs a rest — write your own line for now', 429);
+  }
+  const elapsed = now - assist.at;
+  if (elapsed >= 0 && elapsed < SUGGEST_COOLDOWN_MS) throw new GameError('Slow down a little', 429);
 }
 
 /**
@@ -118,20 +149,47 @@ export function applyAction(state, action, ctx) {
       }
       const roleId = roleOfPlayer(draft.game, player.id);
       if (!roleId) throw new GameError('Spectators cannot speak during the game', 403);
-      const t = gameTime(draft.game, now);
-      // action.text is the era-voice rewrite, done by the server before this runs.
+      // action.text is the era-voice rewrite, done by the server before this runs — or the
+      // player picked one of the lines suggested to them (by index), already in era voice.
+      let text = action.text;
+      let original = action.original;
+      if (action.suggestion != null) {
+        const assist = assistOf(draft, player);
+        const i = action.suggestion;
+        if (!assist || !Number.isInteger(i) || !assist.lines[i]) {
+          throw new GameError('Those suggestions have expired — ask for new ones', 409);
+        }
+        text = assist.lines[i];
+        original = assist.intent ?? undefined; // what the player typed, if anything
+      }
+      if (player.assist) player.assist.lines = []; // suggestions are good until you speak
       const message = addMessage(draft, {
         kind: 'speech',
         roleId,
         playerId: player.id,
-        text: cleanText(action.text).slice(0, 400),
-        original: action.original ? cleanText(action.original) : undefined,
+        text: cleanLine(text),
+        original: original ? cleanLine(original) : undefined,
         to: 'all',
         source: 'human',
-        t,
+        t: gameTime(draft.game, now),
         at: now,
       });
       agents.onSpeech(draft, scenario, message);
+      return draft;
+    }
+
+    case 'suggest': {
+      // Tab assist. action.lines are written by the server (rooms.js prepareSuggest), never
+      // taken from the client; they are stored so "say {suggestion: i}" can use them.
+      const player = requirePlayer(draft, ctx.playerId);
+      checkSuggest(draft, player, now);
+      player.assist = {
+        gameId: draft.game.id,
+        count: (assistOf(draft, player)?.count ?? 0) + 1,
+        at: now,
+        lines: action.lines,
+        intent: action.intent ?? null,
+      };
       return draft;
     }
 

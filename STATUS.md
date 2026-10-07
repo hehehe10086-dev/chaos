@@ -7,21 +7,21 @@ Spec: `CHAOS_MVP_BRIEF.md` · Plan: `PLAN.md` · Judgment calls: `DECISIONS.md` 
 The MVP "The Ides of March" is **playable end to end on the mock LLM**: lobby → role card → 4 acts with
 title cards → timed decisions → ending card with "History vs your timeline". Built on the repo's existing
 stack (JavaScript, React/Vite/Tailwind, Vercel serverless `api/`, Upstash Redis, polling), not the brief's
-default stack — see `DECISIONS.md`. **48 automated tests pass**, including full headless playthroughs that
-reach all 6 endings. Not yet done: README update, a check of `npm start`, a mobile pass, real-LLM testing
-(no API key available), and the M5 stretch goals.
+default stack — see `DECISIONS.md`. **49 automated tests pass**, including full headless playthroughs that
+reach all 6 endings. `npm start` and a phone-width pass are verified, the README is written. Not yet done:
+real-LLM testing (no API key available) and the M5 stretch goals.
 
 ## Milestones
 
-|                    | State                                   | Evidence                                                                                                                                                                                                                                                           |
-| ------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| M0 plan            | ✅ done                                 | `PLAN.md`, `DECISIONS.md`, `CHAOS_MVP_BRIEF.md`; commit `fb91363`                                                                                                                                                                                                  |
-| M1 rooms & chat    | ✅ done, verified                       | Browser: two players on two origins (`localhost:5174` + `127.0.0.1:5174`) joined one room, picked roles (sync shown), chatted. `tests/game.test.js` lobby tests                                                                                                    |
-| M2 scenario engine | ✅ done, verified                       | `tests/endings.test.js`: all 6 endings + "nobody answers → history_repeats" + act variants + late departure; solo all-AI game. Also 40 random seeds × full solo games: all ended with an epilogue                                                                  |
-| M3 LLM layer       | 🟡 code done; **real LLM never called** | Mock path fully exercised. Adapter, JSON retry, timeout, daily cap and fallbacks tested with a fake provider (`tests/llm.test.js`). No `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`, so no real game was played                                                |
-| M4 UI polish       | 🟡 mostly done                          | Seen in the browser (desktop width): home, lobby, role card, game screen, decision modal, ending card. **Not checked yet:** act title card screenshot, phone width (375 px), `prefers-reduced-motion`, the last two tweaks (home cast row, buttons no longer wrap) |
-| M5 stretch         | ⬜ not started                          | takeover / Tab assist / voice                                                                                                                                                                                                                                      |
-| Done criteria      | 🟡                                      | README not updated; `npm run build && npm start` not run yet                                                                                                                                                                                                       |
+|                    | State                                   | Evidence                                                                                                                                                                                                                                                                                                                 |
+| ------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| M0 plan            | ✅ done                                 | `PLAN.md`, `DECISIONS.md`, `CHAOS_MVP_BRIEF.md`; commit `fb91363`                                                                                                                                                                                                                                                        |
+| M1 rooms & chat    | ✅ done, verified                       | Browser: two players on two origins (`localhost:5174` + `127.0.0.1:5174`) joined one room, picked roles (sync shown), chatted. `tests/game.test.js` lobby tests                                                                                                                                                          |
+| M2 scenario engine | ✅ done, verified                       | `tests/endings.test.js`: all 6 endings + "nobody answers → history_repeats" + act variants + late departure; solo all-AI game. Also 40 random seeds × full solo games: all ended with an epilogue                                                                                                                        |
+| M3 LLM layer       | 🟡 code done; **real LLM never called** | Mock path fully exercised. Adapter, JSON retry, timeout, daily cap and fallbacks tested with a fake provider (`tests/llm.test.js`). No `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in `.env`, so no real game was played                                                                                                      |
+| M4 UI polish       | ✅ done, verified                       | Browser at desktop width and 375×812: home, lobby, role card, act card, game (Story / Cast / Your role), decision modal, ending card — no horizontal overflow (DOM check). Fixed lobby overflow, composer focus/placeholder, role-card height. `prefers-reduced-motion` rule verified in the built CSS (not OS-emulated) |
+| M5 stretch         | ⬜ not started                          | takeover / Tab assist / voice                                                                                                                                                                                                                                                                                            |
+| Done criteria      | ✅                                      | README (run / API key / new scenario); `npm run build && npm start` verified on real Redis (smoke test) and `start:offline` (full solo game: "The Scroll", then Play again)                                                                                                                                              |
 
 ## How to run
 
@@ -29,8 +29,9 @@ reach all 6 endings. Not yet done: README update, a check of `npm start`, a mobi
 npm install
 npm run dev:offline   # http://localhost:5173 — in-memory store + mock LLM, safest for testing
 npm run dev           # same, but uses Upstash Redis from .env if configured
-npm test              # 48 tests (redis.test.js hits real Upstash only if .env has credentials)
-npm run build && npm start   # production-like server on http://localhost:3000 (NOT yet verified)
+npm test              # 49 tests (redis.test.js hits real Upstash only if .env has credentials)
+npm run build && npm start   # production-like server on http://localhost:3000 (uses .env: real Redis)
+npm run start:offline        # the same build, in-memory store + mock LLM
 ```
 
 - A faster day for testing: put `TIME_SCALE=0.2` in `.env.offline.local` (gitignored) → a 2-minute game.
@@ -85,7 +86,8 @@ tests/                        setup (memory + mock), harness (fake clock, full p
 - **Mock mode feels scripted:** AI lines cycle through 8 `sampleLines` per role, sometimes prefixed with a
   name ("Antony, …"). The mock rewrite is a crude word swap ("Hark friends, …"). A real API key fixes both.
 - Real-LLM prompts (`server/prompts/`) are untested against a real model; tune after the first real game.
-- OpenAI default model names (`gpt-5.4-nano`, `gpt-5.4-mini`) are unverified — sources disagreed.
+- OpenAI defaults (`gpt-6-luna`, `gpt-6.1-sol`) were checked against OpenAI's docs on 2026-10-06 but never
+  called with a real key.
 - With a real LLM the sender waits up to 8 s for the rewrite before the line appears ("The scribe is writing…").
 - People who join after the start are spectators (M5 "takeover" is not built). A sixth person is refused.
 - The act card only shows if you load the page within 6 s of an act starting.
@@ -96,12 +98,8 @@ tests/                        setup (memory + mock), harness (fake clock, full p
 
 ## Next steps (in order)
 
-1. `npm run build && npm start` → open http://localhost:3000, play a solo game; fix `dev/serve.js` if needed.
-2. M4 checks: phone width 375 px for home / lobby / game (tabs Story-Cast-Your role) / ending; act card
-   look; reduced motion; home cast row; buttons no longer wrap. Fix what's off.
-3. README.md: update "Status", add "Run locally", "Add an API key" (LLM_PROVIDER + key, Vercel env vars),
-   "Add a new scenario" (copy the JSON, register it in `scenarios/index.js`, run `npm test`), OpenAI defaults.
-4. Commit (milestone M3/M4), then M5 in order:
+1. ~~`npm start` check~~, ~~M4 phone pass~~, ~~README~~ — done 2026-10-06.
+2. M5 in order:
    - **Takeover:** action `takeover {roleId}` (playing, role is AI, no open decision for it, player has no
      role) → set `game.roles[roleId].playerId`, clear that agent's `pending`; 3-line recap (what happened /
      secret / goal) via an LLM task with a fallback, like `prepareSay` in `server/rooms.js`; add to
@@ -109,7 +107,7 @@ tests/                        setup (memory + mock), harness (fake clock, full p
    - **Tab assist:** Tab in the composer → 3 short in-character lines (fast model, mock = sample lines);
      typed intention ("I want to stall him") → phrased in era voice; click/Enter sends.
    - **Voice:** Web Speech API in `Composer` (feature-detect), feeding the same send path.
-5. With a real key (after Yuqi adds one): play one full game, read the transcript, tune prompts.
+3. With a real key (after Yuqi adds one): play one full game, read the transcript, tune prompts.
 
 ## Needs Yuqi
 

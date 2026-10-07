@@ -29,7 +29,10 @@ beforeEach(async () => {
 afterEach(() => {
   process.env.LLM_PROVIDER = 'mock';
   delete process.env.ANTHROPIC_API_KEY;
+  delete process.env.OPENAI_API_KEY;
+  delete process.env.MODEL_FAST;
   delete process.env.LLM_DAILY_CAP;
+  vi.unstubAllGlobals();
 });
 
 describe('provider selection', () => {
@@ -42,9 +45,37 @@ describe('provider selection', () => {
       fast: 'claude-haiku-4-5-20251001',
       smart: 'claude-sonnet-5-5',
     });
+    expect(llmConfig({ LLM_PROVIDER: 'openai', OPENAI_API_KEY: 'k' })).toMatchObject({
+      provider: 'openai',
+      fast: 'gpt-6-luna',
+      smart: 'gpt-6.1-sol',
+    });
     expect(llmConfig({ LLM_PROVIDER: 'openai', OPENAI_API_KEY: 'k', MODEL_SMART: 'x' }).smart).toBe(
       'x',
     );
+  });
+
+  it('asks OpenAI reasoning models (gpt-5 and later) for low effort, with room to think', async () => {
+    process.env.LLM_PROVIDER = 'openai';
+    process.env.OPENAI_API_KEY = 'test-key-not-real';
+    const bodies = [];
+    vi.stubGlobal('fetch', async (url, init) => {
+      bodies.push(JSON.parse(init.body));
+      return Response.json({ choices: [{ message: { content: 'Hail, Caesar.' } }] });
+    });
+    const request = { system: 's', messages: [], tier: 'fast', maxTokens: 100, mock: () => '' };
+
+    expect(await complete(request)).toBe('Hail, Caesar.');
+    process.env.MODEL_FAST = 'gpt-4.1-mini'; // not a reasoning model
+    await complete(request);
+
+    expect(bodies[0]).toMatchObject({
+      model: 'gpt-6-luna',
+      reasoning_effort: 'low',
+      max_completion_tokens: 1124,
+    });
+    expect(bodies[1]).toMatchObject({ model: 'gpt-4.1-mini', max_completion_tokens: 100 });
+    expect(bodies[1]).not.toHaveProperty('reasoning_effort');
   });
 
   it("the mock provider runs the task's own deterministic mock", async () => {

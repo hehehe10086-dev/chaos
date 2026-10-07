@@ -13,9 +13,10 @@ import { openaiComplete } from './openai.js';
 export const DEFAULT_TIMEOUT_MS = 8000;
 const DEFAULT_DAILY_CAP = 3000;
 
+// Checked against the providers' model docs on 2026-10-06 (see README "Add an API key").
 export const DEFAULT_MODELS = {
   anthropic: { fast: 'claude-haiku-4-5-20251001', smart: 'claude-sonnet-5-5' },
-  openai: { fast: 'gpt-5.4-nano', smart: 'gpt-5.4-mini' },
+  openai: { fast: 'gpt-6-luna', smart: 'gpt-6.1-sol' },
 };
 
 export class LlmError extends Error {}

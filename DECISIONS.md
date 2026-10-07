@@ -20,9 +20,9 @@ One line each: decision — why. Newest at the bottom.
 - If the host has not polled for 20 s, anyone may start the game — covers "host left the lobby".
 - AI decisions: mock = persona-weighted choice from per-option `aiBias`; LLM failure = historical option (as in the brief).
 - Ending text: the worker writes the AI epilogue/death poem; after 12 s without it the scenario text is used. The death poem appears only for endings that have `fallbackDeathPoem` (Caesar died).
-- No Anthropic server-side refusal-fallback beta — for Sonnet 5.5 it only reroutes cyber/frontier_llm declines, which do not apply here; our own fallbacks handle refusals.
+- No Anthropic server-side refusal-fallback beta — for Sonnet 5.5 it only reroutes cyber/frontier_llm declines, which do not apply here; our own fallbacks handle refusals. (Re-checked 2026-10-06: still true; it does not retry `general_harms`, the one category a violent historical story could hit.)
 - Anthropic calls: system prompt marked `cache_control: ephemeral` (stable per character per game); `effort: low` plus 1024 tokens of headroom on models that think; no `temperature` (Sonnet 5.5 rejects it); Haiku gets no effort setting.
-- OpenAI is called over fetch (no SDK); default models `gpt-5.4-nano` / `gpt-5.4-mini` are unverified — sources disagreed.
+- OpenAI is called over fetch (no SDK); default models `gpt-5.4-nano` / `gpt-5.4-mini` are unverified — sources disagreed. (Superseded below.)
 - `LLM_DAILY_CAP` (default 3000 real calls/day, counted in Redis) protects the public URL from running up a bill.
 - `npm start` is `dev/serve.js`, not a root `server.js` — Vercel treats a root `server.js` as a Node server entrypoint.
 - `npm run dev:offline` / `CHAOS_STORE=memory` for testing without touching Redis or a paid LLM.
@@ -31,3 +31,7 @@ One line each: decision — why. Newest at the bottom.
 - Anti-spam cooldown (1.5 s per player) ignores out-of-order clocks, so a retried write or another server's clock never counts as spam.
 - `npm run start:offline` (= `node dev/serve.js --offline`): the production build with the in-memory store + mock LLM, reading `.env.offline.local` first — `.env` holds the real Redis credentials, and verifying the build should not need them.
 - `dev/serve.js` answers a malformed URL (e.g. `/%`) with 400 and wraps every request in try/catch — one bad request used to crash `npm start` (unhandled rejection).
+- Lobby on phones: the invite box takes the full width ("Copy link") and "How to play" wraps below — the one-row header was 457 px wide at 375 px and scrolled sideways; buttons stay `whitespace-nowrap`, layouts wrap instead.
+- The composer never takes focus by itself (it popped up the phone keyboard and stole focus from the role card); the "plain English" hint moved to the role card and to wide screens, because the long placeholder was cut off on phones.
+- OpenAI defaults are now `gpt-6-luna` (fast) / `gpt-6.1-sol` (smart) — OpenAI's model docs (checked 2026-10-06) list GPT-6 as the current generation; `gpt-5.4-nano` / `-mini` are still available but a generation behind. `reasoning_effort: low` (+1024 tokens of headroom) now goes to every gpt-5-or-later model: the old `gpt-5` check missed GPT-6, which would have spent the whole token limit thinking and returned nothing.
+- README keeps the original design doc and marks where the MVP differs (free-flowing conversation on a clock instead of rounds, no scoring yet); the cost estimate ($0.3–0.6 per game) assumes no prompt caching, because the character prompts are only ~490–610 tokens, around Sonnet 5.5's 512-token caching minimum.

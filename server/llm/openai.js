@@ -1,8 +1,9 @@
 // OpenAI Chat Completions over fetch (no extra dependency). The key comes from OPENAI_API_KEY.
 
-// Models that rejected reasoning_effort — retried without it and remembered.
+// Reasoning models (gpt-5 and later, o-series) think before answering; low effort keeps short
+// lines fast. Models that rejected reasoning_effort — retried without it and remembered.
 const noEffort = new Set();
-const usesEffort = (model) => /^(gpt-5|o\d)/.test(model) && !noEffort.has(model);
+const usesEffort = (model) => /^(gpt-[5-9]|o\d)/.test(model) && !noEffort.has(model);
 
 export async function openaiComplete({ model, system, messages, maxTokens, signal }) {
   const effort = usesEffort(model);

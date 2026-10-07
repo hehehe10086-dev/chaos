@@ -146,6 +146,7 @@ export default function Game({ view, receivedAt, act, connection }) {
             }
             onSend={(text) => act({ type: 'say', text })}
             busyHint="The scribe is writing…"
+            voice={Boolean(myRole)}
             assist={
               myRole && {
                 request: async (text) => {

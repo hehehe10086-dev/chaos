@@ -1,7 +1,8 @@
 // The shared conversation. A reading game: comfortable line length, clear speakers,
 // narrator lines centered and italic, private narrator lines marked as such.
 
-import { useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useSpeechInput } from '../hooks/useSpeechInput.js';
 import { Medallion } from './Medallion.jsx';
 import { Button, ErrorText } from './ui.jsx';
 
@@ -133,14 +134,31 @@ function QuillIcon() {
   );
 }
 
+function MicIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-4"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <rect x="9" y="3" width="6" height="11" rx="3" strokeWidth="1.6" />
+      <path strokeWidth="1.6" strokeLinecap="round" d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" />
+    </svg>
+  );
+}
+
 /**
  * The input row. It never grabs focus on its own (on a phone that would pop up the keyboard
  * over the screen); after a send it keeps focus, so you can type the next line.
  * busyHint: shown while a line is being sent (e.g. "The scribe is writing…").
  * assist: Tab assist — { request(text) -> {ok, lines}, send(index) -> {ok} }. Tab (or "Ideas")
  *   shows three lines to say, or three ways to say what you typed; click or Enter says one.
+ * voice: offer "Speak" (Web Speech API, where the browser has it). What you say lands in the
+ *   box; you send it like typed text, so it goes through the same era-voice rewrite.
  */
-export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint, assist }) {
+export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint, assist, voice }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -149,10 +167,39 @@ export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint
   const request = useRef(0); // the latest suggestion request; older answers are dropped
   const tabMovesOn = useRef(false); // after Esc, Tab leaves the input as usual (no keyboard trap)
   const listId = useId();
+  const typedBeforeSpeech = useRef('');
+  const speech = useSpeechInput((heard) => {
+    const before = typedBeforeSpeech.current;
+    setText(`${before}${before && heard ? ' ' : ''}${heard}`.slice(0, 200));
+  });
+  const canSpeak = voice && speech.supported;
+  const listening = speech.listening;
+
+  // When listening ends on a computer, put the cursor back in the box, so Enter sends it.
+  // (Not on touch screens: focusing would pop up the keyboard.)
+  const wasListening = useRef(false);
+  useEffect(() => {
+    if (wasListening.current && !listening && !window.matchMedia?.('(pointer: coarse)').matches) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+    wasListening.current = listening;
+  }, [listening]);
+
+  function toggleSpeech() {
+    if (listening) {
+      speech.stop();
+      return;
+    }
+    closeIdeas();
+    setError(null);
+    typedBeforeSpeech.current = text.trim(); // what you say is added after what you typed
+    speech.start();
+  }
 
   async function run(send) {
     setBusy(true);
     setError(null);
+    speech.clearError();
     const result = await send();
     setBusy(false);
     if (result.ok) {
@@ -296,8 +343,8 @@ export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint
           maxLength={200}
           autoComplete="off"
           disabled={disabled}
-          readOnly={busy}
-          placeholder={placeholder}
+          readOnly={busy || listening}
+          placeholder={listening ? 'Listening…' : placeholder}
           role={assist ? 'combobox' : undefined}
           aria-autocomplete={assist ? 'list' : undefined}
           aria-expanded={assist ? Boolean(ideas) : undefined}
@@ -326,8 +373,25 @@ export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint
               </kbd>
             </button>
           )}
+          {canSpeak && (
+            <button
+              type="button"
+              className={TOOL_BUTTON}
+              onClick={toggleSpeech}
+              disabled={disabled || busy}
+              aria-pressed={listening}
+            >
+              <MicIcon />
+              Speak
+              {listening && <span className="size-2 rounded-full bg-blood-bright" />}
+            </button>
+          )}
           <span className="min-w-0">
-            {busy && busyHint ? (
+            {listening ? (
+              <span className="text-bronze-bright italic" role="status">
+                Listening… press Speak again to stop.
+              </span>
+            ) : busy && busyHint ? (
               <span className="text-bronze-bright italic">{busyHint}</span>
             ) : (
               hint
@@ -336,7 +400,7 @@ export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint
         </div>
         {footer}
       </div>
-      <ErrorText error={error} className="mx-auto mt-1 max-w-[42rem]" />
+      <ErrorText error={error ?? speech.error} className="mx-auto mt-1 max-w-[42rem]" />
     </form>
   );
 }

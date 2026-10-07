@@ -19,7 +19,7 @@ Yuqi builds it alone (the teammate is credited but not active).
 - `npm run dev` — frontend + `/api` at http://localhost:5173 (uses Redis from `.env` if present)
 - `npm run dev:offline` — same, but in-memory store + mock LLM (never touches Redis or a paid API)
 - `npm test` — Vitest (tests force memory store + mock; `tests/redis.test.js` uses real Upstash if `.env` has it)
-- `npm run build` then `npm start` — production-like local server at http://localhost:3000 (`dev/serve.js`)
+- `npm run build` then `npm start` — production-like local server at http://localhost:3000 (`dev/serve.js`); `npm run start:offline` = the same with the in-memory store + mock LLM
 - `npm run format` — Prettier
 
 `/api/*.js` export Web-standard handlers (`export const GET = route(async (request) => Response)`).
@@ -34,6 +34,7 @@ Locally they are served by `dev/api-dispatch.js`; on Vercel the same files run a
 - Endings and decisions are decided by game rules and buttons. The LLM only performs. Never infer decisions or flags from chat.
 - LLM prompts never contain another role's secrets. The epilogue sees only the public transcript.
 - Every LLM call has a timeout and a non-LLM fallback (`server/ai/tasks.js`), so the game never stalls.
+- LLM work needed before a write goes in `PREPARE` (`server/rooms.js`): it rebuilds the action from scratch, so server-only fields (a rewrite, a recap, suggested lines) never come from the client.
 - No server timers: every request runs `advance()` (lazy tick); slow AI work runs in a background worker (`server/ai/worker.js`, `waitUntil` + Redis lock).
 
 ## Code conventions

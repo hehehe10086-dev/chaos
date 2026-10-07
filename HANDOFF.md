@@ -8,5 +8,6 @@ For a new AI tool or session continuing this project. You need no chat history �
 3. `CLAUDE.md` — project rules (architecture rules, commands, conventions). Codex: treat it as `AGENTS.md`.
 4. `DECISIONS.md` and `PLAN.md` — why things are the way they are. Don't undo a decision without logging why.
 
-Before changing code: `npm install && npm test` (expect 48 passing) and `npm run build`.
-After each change: run both again. Test in the browser with `npm run dev:offline`.
+Before changing code: `npm install && npm test` (expect 74 passing) and `npm run build`.
+After each change: run both again. Test in the browser with `npm run dev:offline` (or the built app with
+`npm run build && npm run start:offline`).

@@ -44,6 +44,8 @@ No login. No install. Works on phones and laptops.
 Target session length: **10–15 minutes**.
 
 > **In the MVP** the conversation is free-flowing rather than strict rounds: a Director fires historical events on a 10-minute clock across four acts, and at decision points one character must choose (only they see the options; if time runs out, history chooses). The ending compares **History** with **Your timeline**.
+>
+> Also built: **join late** and take over any AI character, with a three-line recap of what you missed · **press Tab** (or tap *Ideas*) for three in-character lines — or type what you mean ("I want to stall him") and get three ways to say it in period voice · **speak instead of typing** where the browser supports it.
 
 ### Era Voice example
 
@@ -110,7 +112,7 @@ The in-character bonus is the only AI-judged score. Endings and objectives are r
 ```
 Browser (phone / laptop)
    │  POST /api/room      create / join → a secret player token (the server keeps only its hash)
-   │  POST /api/action    pick a role, start, speak, decide, play again …
+   │  POST /api/action    pick a role, start, speak, decide, take over, suggest lines, play again
    │  GET  /api/state     polling (~1.5 s) → this player's view, filtered on the server
    ▼
 Vercel serverless functions (api/*.js are thin; logic lives in server/)
@@ -146,7 +148,7 @@ Upstash Redis — one hash per room (in-memory store when developing locally)
 
 **P0 — Core (must ship)**
 - [x] Room code / invite link *(a lobby that lists several stories comes with the second story)*
-- [ ] Seat model: AI fill-in ✅, human takeover, AI stand-in on disconnect
+- [ ] Seat model: AI fill-in ✅, human takeover ✅ *(with a recap)*, AI stand-in on disconnect
 - [x] Conversation with Era Voice *(free-flowing on a clock rather than strict rounds)*
 - [x] Decision points, endings, reveal *(no scoring yet)*
 - [x] One complete story, playable end to end on phone and laptop
@@ -154,7 +156,7 @@ Upstash Redis — one hash per room (in-memory store when developing locally)
 **P1 — Experience**
 - [ ] Multiple rooms per story with automatic assignment
 - [x] Spectator mode *(people who join after the start watch the game)*
-- [ ] AI-suggested lines for mobile
+- [x] AI-suggested lines for mobile *(Tab or "Ideas"; also voice input)*
 - [ ] 2–3 stories with different player counts
 
 **P2 — Extras**
@@ -217,7 +219,7 @@ Without a key the game is fully playable on the **mock AI**: characters say scri
 
 Never commit `.env` or put a key in frontend code — this repository is public. If `LLM_PROVIDER` is unset or its key is missing, the game falls back to the mock AI.
 
-| `LLM_PROVIDER` | Fast model — era voice | Smart model — AI characters, decisions, epilogue |
+| `LLM_PROVIDER` | Fast model — era voice, suggestions, recaps | Smart model — AI characters, decisions, epilogue |
 |---|---|---|
 | `anthropic` | `claude-haiku-4-5-20251001` | `claude-sonnet-5-5` |
 | `openai` | `gpt-6-luna` | `gpt-6.1-sol` |

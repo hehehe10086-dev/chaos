@@ -2,25 +2,25 @@
 
 ## Current status
 
-Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM; 48 tests pass. See `STATUS.md` for details and next steps. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
+Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). See `STATUS.md` for details, what is verified, and "Needs Yuqi". `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
 
 ## Decisions
 
 - State store: Upstash Redis (single region, us-east-1) + polling; conditional writes via Lua on `version`
-- LLM: behind an adapter (`server/llm/client.js`); Claude Haiku 4.5 candidate, compared against Gemini Flash in W1
+- LLM: behind an adapter (`server/llm/index.js`): Anthropic (Haiku 4.5 fast + Sonnet 5.5 smart) by default, OpenAI optional, deterministic mock offline
 - Language: JavaScript (+ JSDoc where types help)
-- First story: B-59 submarine, Cuban Missile Crisis, Oct 1962
-- AI voting: each AI seat has a numeric `lean` set by rules; each round an LLM structured judgment may shift it by at most ±1; the vote is a threshold on `lean`
+- First story: The Ides of March (the B-59 idea is shelved — see `DECISIONS.md`)
+- Decisions instead of votes: at fixed points one character chooses (AI: persona-weighted or LLM choice); endings come from game rules, never from the LLM
 
 ## In progress
 
-- Yuqi — branch `feat/m1-sync`: room create/join, seatToken auth, CAS writes, polling, per-player view
+- Yuqi — review and push `mvp-caesar`, open the PR, test the Vercel Preview; add an Anthropic key
 
 ## Next (by priority)
 
-1. PR for `feat/m1-sync` is open and Redis is connected to the Vercel project: redeploy the Preview, test with laptop + real phone, then merge
-2. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
-3. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
+1. Push + PR + Vercel Preview on a laptop and a real phone, then merge
+2. With a real key: play a full game, read the transcript, tune prompts and check the cost
+3. Real-phone checks: takeover from a second phone, "Ideas", voice input
 
 ## Milestones
 
@@ -37,6 +37,7 @@ Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BR
 
 ## Log
 
+- 2026-10-06 Claude (evening) — `npm start` verified (fixed: a malformed URL crashed it; added `start:offline`); phone-width pass (fixed lobby overflow, composer focus/placeholder, role card height); README run / API key / new scenario; OpenAI defaults → GPT-6 (+ reasoning-effort fix); M5: takeover with recap, Tab assist, voice input; fixed long era-voice rewrites being rejected and `tidyLine` dropping closing quotes. 74 tests.
 - 2026-10-06 Claude — MVP on `mvp-caesar`: scenario JSON + schema, timeline engine, AI agents + worker, LLM adapter (mock/Anthropic/OpenAI), lobby/game/ending UI; STATUS.md written. Yuqi now works solo; B-59 shelved for the Ides of March.
 - 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.
 - 2026-10-05 Claude — wrote HANDOFF.md (handoff to another AI tool).

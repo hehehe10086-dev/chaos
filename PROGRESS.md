@@ -2,9 +2,7 @@
 
 ## Current status
 
-M1 sync sandbox is committed on branch `feat/m1-sync` (not pushed). Verified by Claude locally with the in-memory store: create room → 4-letter code → second player joins → shared counter + messages sync via polling within ~2s; refresh keeps identity; 20 concurrent increments lose nothing; 9 vitest tests pass.
-Yuqi verified locally on 2026-10-05 with the in-memory store and then with real Upstash Redis (rooms survive a dev-server restart). NOT yet verified: M1 on Vercel; real phone.
-`main` = scaffold only, live at https://chaos-ten-hazel.vercel.app/ (`/api/health` OK).
+Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM; 48 tests pass. See `STATUS.md` for details and next steps. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
 
 ## Decisions
 
@@ -39,6 +37,7 @@ Yuqi verified locally on 2026-10-05 with the in-memory store and then with real 
 
 ## Log
 
+- 2026-10-06 Claude — MVP on `mvp-caesar`: scenario JSON + schema, timeline engine, AI agents + worker, LLM adapter (mock/Anthropic/OpenAI), lobby/game/ending UI; STATUS.md written. Yuqi now works solo; B-59 shelved for the Ides of March.
 - 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.
 - 2026-10-05 Claude — wrote HANDOFF.md (handoff to another AI tool).
 - 2026-10-05 Yuqi — M1 sync sandbox: /api/room, /api/state, /api/action; memory + Redis stores; 9 tests.

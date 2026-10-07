@@ -4,7 +4,8 @@
 // Both return { code, token, playerId, view }.
 
 import { normalizeRoomCode } from '../server/auth.js';
-import { GameError, cleanName } from '../server/engine/applyAction.js';
+import { GameError } from '../server/engine/errors.js';
+import { cleanName } from '../server/engine/state.js';
 import { json, readJson, route } from '../server/http.js';
 import { createRoom, joinRoom } from '../server/rooms.js';
 

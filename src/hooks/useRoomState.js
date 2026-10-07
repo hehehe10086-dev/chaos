@@ -1,7 +1,9 @@
 // Keeps a room's view up to date by polling the server.
-// - polls every POLL_MS while the tab is visible, pauses when hidden (saves Redis commands)
+// - polls every POLL_MS while the tab is visible, pauses when hidden (saves Redis commands;
+//   the game clock also pauses on the server when nobody is watching)
 // - sends the version it has, so the server can answer "no change" cheaply
 // - setView lets an action response update the screen immediately, without waiting for a poll
+// - receivedAt lets the countdown run smoothly between polls
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchState } from '../lib/api.js';
@@ -9,7 +11,7 @@ import { fetchState } from '../lib/api.js';
 const POLL_MS = 1500;
 
 export function useRoomState(code, token) {
-  const [view, setViewState] = useState(null);
+  const [state, setState] = useState({ view: null, receivedAt: 0 });
   const [error, setError] = useState(null);
   const versionRef = useRef(null);
 
@@ -17,7 +19,7 @@ export function useRoomState(code, token) {
   const setView = useCallback((next) => {
     if (versionRef.current != null && next.version < versionRef.current) return;
     versionRef.current = next.version;
-    setViewState(next);
+    setState({ view: next, receivedAt: Date.now() });
   }, []);
 
   useEffect(() => {
@@ -55,5 +57,5 @@ export function useRoomState(code, token) {
     };
   }, [code, token, setView]);
 
-  return { view, setView, error };
+  return { view: state.view, receivedAt: state.receivedAt, setView, error };
 }

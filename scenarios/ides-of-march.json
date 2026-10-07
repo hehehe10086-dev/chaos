@@ -1,0 +1,587 @@
+{
+  "meta": {
+    "id": "ides-of-march",
+    "title": "The Ides of March",
+    "tagline": "You know how it ends. Change it.",
+    "setting": "Rome, 15 March, 44 BC",
+    "intro": "Rome, 15 March, 44 BC. Julius Caesar, dictator for life, will attend the Senate today. Some of the men he trusts most have hidden knives under their togas. History has already written this day. You have not.",
+    "durationSeconds": 600,
+    "speechStyle": "Elevated, Shakespeare-inspired English with Roman color (the gods, the Senate, Rome, honor). Dramatic but readable to a modern player. Use 'thou/thee' sparingly at most. Never modern slang.",
+    "mockStyle": {
+      "replacements": [
+        ["you guys", "my friends"],
+        ["guys", "friends"],
+        ["okay", "very well"],
+        ["ok", "very well"],
+        ["yeah", "aye"],
+        ["yep", "aye"],
+        ["yes", "aye"],
+        ["nope", "nay"],
+        ["hello", "hail"],
+        ["hi", "hail"],
+        ["hey", "hark"],
+        ["gonna", "going to"],
+        ["wanna", "wish to"],
+        ["gotta", "must"],
+        ["really", "truly"],
+        ["maybe", "perhaps"],
+        ["awesome", "splendid"],
+        ["cool", "fine"],
+        ["dude", "friend"],
+        ["bro", "brother"],
+        ["please", "I pray you"],
+        ["thanks", "my thanks"],
+        ["sorry", "forgive me"],
+        ["kill", "strike down"],
+        ["police", "the guard"],
+        ["cops", "the guard"],
+        ["phone", "messenger"],
+        ["gun", "blade"]
+      ],
+      "openers": ["", "", "By the gods, ", "Hear me: ", "Upon my honor, ", "Friends, "],
+      "closers": ["", "", "", " — for Rome", ", by Jupiter"]
+    },
+    "deathPoem": { "role": "caesar" }
+  },
+  "flags": {
+    "caesarWent": false,
+    "caesarStayedFirm": false,
+    "readNote": false,
+    "antonyPresent": false,
+    "brutusChoice": null,
+    "plotExposed": false,
+    "caesarAlive": true
+  },
+  "roles": [
+    {
+      "id": "caesar",
+      "name": "Julius Caesar",
+      "shortName": "Caesar",
+      "aliases": ["Caesar", "Julius", "dictator"],
+      "publicIdentity": "Dictator of Rome for life.",
+      "secret": "You have heard whispers of a plot, but showing fear before the Senate would make you look weak.",
+      "goal": "Appear at the Senate today and leave with even more power.",
+      "portraitKey": "caesar",
+      "persona": "Proud and theatrical. You never show fear in public and sometimes speak of yourself as 'Caesar'. You enjoy being admired and dislike being managed.",
+      "bonds": { "loves": "your wife Calpurnia", "loyalTo": "your own glory and Rome" },
+      "traitRanges": {
+        "intelligence": [2, 5],
+        "loyalty": [2, 4],
+        "ambition": [4, 5],
+        "lovestruck": [1, 4],
+        "obedience": [1, 2]
+      },
+      "knows": ["whispers"],
+      "sampleLines": [
+        "I fear no plot that only whispers. Let it speak to my face.",
+        "Rome does not wait upon a bad dream.",
+        "Brutus, you are quiet this morning. What weighs upon you?",
+        "The Senate would honor me today. Shall Caesar hide behind his door?",
+        "Cowards die many times before their deaths; I mean to die but once.",
+        "Antony, stay near. I would have one honest face beside me.",
+        "The gods send dreams to frighten the timid, not to rule Caesar.",
+        "Whoever holds a grievance, let him bring it to me in the light."
+      ]
+    },
+    {
+      "id": "brutus",
+      "name": "Marcus Brutus",
+      "shortName": "Brutus",
+      "aliases": ["Brutus", "Marcus"],
+      "publicIdentity": "A respected senator. Caesar treats you almost like a son.",
+      "secret": "You are at the heart of the conspiracy. Rumor says Caesar may truly be your father.",
+      "goal": "Save the Republic — or stop the knives at the last moment.",
+      "portraitKey": "brutus",
+      "persona": "Your core tension: \"Not that I loved Caesar less, but that I loved Rome more.\" You are honorable, torn, and slow to speak; you weigh every word as if history were listening.",
+      "bonds": {
+        "loves": "your wife Portia, and Caesar more than you admit",
+        "loyalTo": "the Republic"
+      },
+      "traitRanges": {
+        "intelligence": [3, 5],
+        "loyalty": [2, 5],
+        "ambition": [1, 3],
+        "lovestruck": [2, 4],
+        "obedience": [2, 4]
+      },
+      "knows": ["plot"],
+      "sampleLines": [
+        "I love Caesar. I love Rome more. Do not ask me which wins today.",
+        "There is a tide in the affairs of men, and it is rising this morning.",
+        "Cassius, your words are sharp. Be sure they cut the right thing.",
+        "If Caesar would be a king, what then becomes of us?",
+        "I have not slept. My conscience keeps a louder watch than any guard.",
+        "Speak plainly, friend. On whose side do you stand?",
+        "The Republic is older than any man in it. Even Caesar.",
+        "Let what is done today be done for Rome, and not for hate."
+      ]
+    },
+    {
+      "id": "cassius",
+      "name": "Gaius Cassius",
+      "shortName": "Cassius",
+      "aliases": ["Cassius", "Gaius"],
+      "publicIdentity": "A senator and veteran soldier.",
+      "secret": "You organized the conspiracy. Without Brutus's name, it falls apart.",
+      "goal": "Caesar must die today, and Brutus must strike.",
+      "portraitKey": "cassius",
+      "persona": "Lean and hungry. Persuasive, impatient and watchful. You work on Brutus's sense of honor and his ancestors, and you keep the plot hidden from everyone else.",
+      "bonds": { "loves": "no one so much as the old Republic", "loyalTo": "the conspiracy" },
+      "traitRanges": {
+        "intelligence": [3, 5],
+        "loyalty": [1, 3],
+        "ambition": [4, 5],
+        "lovestruck": [1, 2],
+        "obedience": [1, 2]
+      },
+      "knows": ["plot"],
+      "sampleLines": [
+        "The fault, dear Brutus, is not in our stars, but in ourselves.",
+        "Every hour we wait, his crown grows heavier and our chains grow tighter.",
+        "A man who would be king must learn what Romans do to kings.",
+        "Keep your voice low. The walls of Rome have ears, and Caesar pays them.",
+        "Do not let a dream undo the work of honest men.",
+        "Think of your ancestors, Brutus. They drove out the last king of Rome.",
+        "The Senate is ready. Only courage is missing.",
+        "Smile at Caesar today. Tomorrow we need not smile at anyone."
+      ]
+    },
+    {
+      "id": "calpurnia",
+      "name": "Calpurnia",
+      "shortName": "Calpurnia",
+      "aliases": ["Calpurnia", "wife"],
+      "publicIdentity": "Caesar's wife.",
+      "secret": "Last night you dreamed you held Caesar's bloodied body in your arms.",
+      "goal": "Keep Caesar home today.",
+      "portraitKey": "calpurnia",
+      "persona": "Frightened by omens, loving and stubborn. You appeal to Caesar's love, not his pride, and you notice who will not meet your eyes.",
+      "bonds": { "loves": "your husband Caesar", "loyalTo": "Caesar" },
+      "traitRanges": {
+        "intelligence": [2, 5],
+        "loyalty": [4, 5],
+        "ambition": [1, 2],
+        "lovestruck": [4, 5],
+        "obedience": [2, 4]
+      },
+      "knows": ["dream"],
+      "sampleLines": [
+        "Husband, I beg you, stay. The gods have warned us twice.",
+        "I saw you red as a sacrifice, and Romans smiling as they washed their hands.",
+        "Send word that you are unwell. Let the Senate wait one day.",
+        "If you will not fear for yourself, then fear for me.",
+        "Antony, you are his friend. Help me keep him here.",
+        "The priests found no heart in the beast this morning. Does that mean nothing?",
+        "I have never asked you for anything. I ask you now.",
+        "Brutus, you have a strange look today. Why will you not meet my eyes?"
+      ]
+    },
+    {
+      "id": "antony",
+      "name": "Mark Antony",
+      "shortName": "Antony",
+      "aliases": ["Antony", "Mark", "consul"],
+      "publicIdentity": "Caesar's right hand and consul.",
+      "secret": "You sense something is wrong, but you have no proof.",
+      "goal": "Keep Caesar alive.",
+      "portraitKey": "antony",
+      "persona": "Loyal, physical and blunt, with a soldier's speech. You distrust the senators' warm smiles but you have no proof of anything.",
+      "bonds": { "loves": "Caesar, as a brother in arms", "loyalTo": "Caesar" },
+      "traitRanges": {
+        "intelligence": [2, 4],
+        "loyalty": [4, 5],
+        "ambition": [2, 4],
+        "lovestruck": [1, 3],
+        "obedience": [2, 5]
+      },
+      "knows": [],
+      "sampleLines": [
+        "Something is wrong in the city today. I can smell it like smoke.",
+        "Caesar, let me walk beside you. A consul's sword is not for show.",
+        "These senators smile too warmly. I trust a frown more.",
+        "Brutus, Cassius — you are up early. What business brings you out?",
+        "If any man means Caesar harm, he will meet me first.",
+        "Lady Calpurnia, dreams are smoke, but I will keep my eyes open.",
+        "Give me a name, and I will give you justice.",
+        "Rome loves Caesar. Rome also loves a spectacle. Let us not give it one."
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "id": "plot",
+      "text": "Several senators will strike Caesar with hidden knives when the Senate meets in the Theatre of Pompey."
+    },
+    { "id": "dream", "text": "Calpurnia dreamed she held Caesar's bloodied body." },
+    { "id": "whispers", "text": "There are vague rumors of a plot against Caesar; no names." }
+  ],
+  "acts": [
+    {
+      "id": "dawn",
+      "number": 1,
+      "mark": "起",
+      "title": "Dawn",
+      "startAt": 0,
+      "poem": ["A dream of blood at dawn.", "The sun rises anyway."]
+    },
+    {
+      "id": "house",
+      "number": 2,
+      "mark": "承",
+      "title": "The House",
+      "startAt": 120,
+      "poem": ["She holds his sleeve.", "Rome holds his name."]
+    },
+    {
+      "id": "road",
+      "number": 3,
+      "mark": "转",
+      "title": "The Road",
+      "startAt": 300,
+      "poem": ["A note in his hand.", "The crowd presses closer."],
+      "variants": [
+        {
+          "condition": { "flag": "caesarWent", "eq": false },
+          "title": "The Visitor",
+          "poem": ["A friend at the door.", "A smile with no warmth."]
+        }
+      ]
+    },
+    {
+      "id": "senate",
+      "number": 4,
+      "mark": "合",
+      "title": "The Senate",
+      "startAt": 480,
+      "poem": ["The doors close softly.", "Marble does not choose sides."],
+      "variants": [
+        {
+          "condition": { "flag": "caesarWent", "eq": false },
+          "title": "The Locked Door",
+          "poem": ["The house is quiet.", "The knives are patient."]
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "nightmare",
+      "at": 0,
+      "visibility": "all",
+      "text": "Before dawn, Calpurnia wakes screaming from a nightmare.",
+      "concerns": ["calpurnia", "caesar"]
+    },
+    {
+      "id": "nightmare_private",
+      "at": 0,
+      "visibility": ["calpurnia"],
+      "text": "In your dream, Caesar lay bleeding in your arms."
+    },
+    {
+      "id": "knives_ready",
+      "at": 30,
+      "visibility": ["brutus", "cassius"],
+      "text": "The knives are hidden. The others will be waiting at the Theatre of Pompey."
+    },
+    {
+      "id": "soothsayer",
+      "at": 90,
+      "visibility": "all",
+      "text": "In the street, a soothsayer cries out: \"Beware the Ides of March.\"",
+      "concerns": ["caesar", "calpurnia"]
+    },
+    {
+      "id": "messenger",
+      "at": 210,
+      "visibility": "all",
+      "text": "A messenger arrives: the Senate is waiting for Caesar.",
+      "concerns": ["caesar", "cassius"]
+    },
+    {
+      "id": "decimus",
+      "at": 310,
+      "visibility": "all",
+      "text": "Decimus, a friend Caesar trusts, arrives at the house: \"Shall the Senate say Caesar stays home because of his wife's dreams?\"",
+      "condition": { "flag": "caesarWent", "eq": false },
+      "concerns": ["caesar", "calpurnia"]
+    },
+    {
+      "id": "artemidorus",
+      "at": 380,
+      "visibility": "all",
+      "text": "On the way, a Greek scholar named Artemidorus pushes a small scroll into Caesar's hand: \"Read this alone, and quickly.\"",
+      "condition": { "flag": "caesarWent", "eq": true },
+      "concerns": ["caesar", "cassius"]
+    },
+    {
+      "id": "antony_drawn_aside",
+      "at": 420,
+      "visibility": "all",
+      "text": "At the Senate steps, a senator takes Antony by the arm and draws him aside to talk.",
+      "condition": { "flag": "caesarWent", "eq": true },
+      "concerns": ["antony"]
+    },
+    {
+      "id": "doors_close",
+      "at": 490,
+      "visibility": "all",
+      "text": "The Senate doors close. Senators crowd around Caesar with a petition. Casca's hand moves beneath his toga.",
+      "condition": {
+        "all": [
+          { "flag": "caesarWent", "eq": true },
+          { "flag": "plotExposed", "eq": false }
+        ]
+      },
+      "concerns": ["caesar", "brutus", "cassius"]
+    },
+    {
+      "id": "names",
+      "at": 490,
+      "visibility": "all",
+      "text": "Caesar unrolls the scroll. Names. Familiar names. He looks up at the men around him.",
+      "condition": { "flag": "readNote", "eq": true },
+      "concerns": ["caesar", "brutus", "cassius"]
+    },
+    {
+      "id": "quiet_house",
+      "at": 490,
+      "visibility": "all",
+      "text": "The house is quiet. Outside, Cassius waits for news that will not come.",
+      "condition": { "flag": "caesarStayedFirm", "eq": true },
+      "concerns": ["cassius", "calpurnia"]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "go_to_senate",
+      "at": 270,
+      "role": "caesar",
+      "prompt": "The Senate is waiting. Will you go?",
+      "timeoutSeconds": 30,
+      "historicalOptionId": "go",
+      "concerns": ["calpurnia"],
+      "options": [
+        {
+          "id": "go",
+          "label": "Go to the Senate",
+          "narration": "Caesar laughs off the dream and calls for his litter.",
+          "setsFlags": { "caesarWent": true },
+          "aiBias": { "ambition": 1, "intelligence": -0.5 }
+        },
+        {
+          "id": "stay",
+          "label": "Stay home",
+          "narration": "Caesar sends word that he is unwell and will not come today.",
+          "aiBias": { "lovestruck": 1, "intelligence": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "second_chance",
+      "at": 330,
+      "role": "caesar",
+      "prompt": "Decimus is waiting. Go after all?",
+      "timeoutSeconds": 25,
+      "historicalOptionId": "go_after_all",
+      "condition": { "flag": "caesarWent", "eq": false },
+      "concerns": ["calpurnia"],
+      "options": [
+        {
+          "id": "go_after_all",
+          "label": "Go after all",
+          "narration": "Stung by the word \"fear\", Caesar calls for his litter after all.",
+          "setsFlags": { "caesarWent": true },
+          "aiBias": { "ambition": 1 }
+        },
+        {
+          "id": "stay_firm",
+          "label": "Stay with Calpurnia",
+          "narration": "Caesar sends Decimus away and stays with his wife.",
+          "setsFlags": { "caesarStayedFirm": true },
+          "aiBias": { "lovestruck": 1, "intelligence": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "read_note",
+      "at": 390,
+      "role": "caesar",
+      "prompt": "A scroll is in your hand and the crowd is pressing in. Read it now?",
+      "timeoutSeconds": 20,
+      "historicalOptionId": "later",
+      "condition": { "flag": "caesarWent", "eq": true },
+      "options": [
+        {
+          "id": "read",
+          "label": "Read it now",
+          "narration": "Caesar steps out of the crowd and unrolls the scroll.",
+          "setsFlags": { "readNote": true, "plotExposed": true },
+          "aiBias": { "intelligence": 1 }
+        },
+        {
+          "id": "later",
+          "label": "Read it later",
+          "narration": "Caesar tucks the scroll among his papers, unread.",
+          "aiBias": { "ambition": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "antony_stays",
+      "at": 430,
+      "role": "antony",
+      "prompt": "A senator wants a word with you, away from Caesar.",
+      "timeoutSeconds": 20,
+      "historicalOptionId": "follow",
+      "condition": { "flag": "caesarWent", "eq": true },
+      "concerns": ["caesar"],
+      "options": [
+        {
+          "id": "follow",
+          "label": "Go with the senator",
+          "narration": "Antony lets himself be led away, deep in conversation.",
+          "setsFlags": { "antonyPresent": false },
+          "aiBias": { "obedience": 1 }
+        },
+        {
+          "id": "stay",
+          "label": "Stay at Caesar's side",
+          "narration": "Antony shakes off the senator's hand and stays at Caesar's side.",
+          "setsFlags": { "antonyPresent": true },
+          "aiBias": { "loyalty": 1, "intelligence": 0.5 }
+        }
+      ]
+    },
+    {
+      "id": "brutus_choice",
+      "at": 500,
+      "role": "brutus",
+      "prompt": "The knives are out. Caesar's eyes find yours.",
+      "timeoutSeconds": 20,
+      "historicalOptionId": "strike",
+      "condition": {
+        "all": [
+          { "flag": "caesarWent", "eq": true },
+          { "flag": "plotExposed", "eq": false }
+        ]
+      },
+      "concerns": ["caesar", "cassius"],
+      "options": [
+        {
+          "id": "strike",
+          "label": "Strike",
+          "narration": "Brutus draws his knife.",
+          "setsFlags": { "brutusChoice": "strike" },
+          "aiBias": { "ambition": 0.5, "obedience": 0.5 }
+        },
+        {
+          "id": "warn",
+          "label": "Warn Caesar",
+          "narration": "Brutus shouts: \"Caesar — the knives!\"",
+          "setsFlags": { "brutusChoice": "warn", "plotExposed": true },
+          "aiBias": { "loyalty": 1, "lovestruck": 0.5 }
+        },
+        {
+          "id": "hesitate",
+          "label": "Do nothing",
+          "narration": "Brutus's hand does not move.",
+          "setsFlags": { "brutusChoice": "hesitate" },
+          "aiBias": { "loyalty": 0.5, "intelligence": -0.5 }
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "the_scroll",
+      "priority": 1,
+      "title": "The Scroll",
+      "condition": { "flag": "readNote", "eq": true },
+      "fallbackEpilogue": "Caesar read the names in time. By nightfall the conspirators were in chains, and the Republic's last defenders were branded traitors. Caesar lived — and ruled with a hand that grew heavier every year.",
+      "setsFlags": { "caesarAlive": true }
+    },
+    {
+      "id": "betrayer_betrayed",
+      "priority": 2,
+      "title": "The Betrayer Betrayed",
+      "condition": { "flag": "brutusChoice", "eq": "warn" },
+      "fallbackEpilogue": "At the last moment Brutus cried out a warning. The plot collapsed. Caesar lived; Brutus was spared — and hated by both sides for the rest of his life.",
+      "setsFlags": { "caesarAlive": true }
+    },
+    {
+      "id": "stayed_home",
+      "priority": 3,
+      "title": "The Man Who Stayed Home",
+      "condition": { "flag": "caesarStayedFirm", "eq": true },
+      "fallbackEpilogue": "Caesar listened to his wife. The Ides passed quietly. Somewhere in Rome, Cassius began planning a second day.",
+      "setsFlags": { "caesarAlive": true }
+    },
+    {
+      "id": "antonys_blade",
+      "priority": 4,
+      "title": "Antony's Blade",
+      "condition": {
+        "all": [
+          { "flag": "antonyPresent", "eq": true },
+          { "flag": "brutusChoice", "in": ["strike", "hesitate"] }
+        ]
+      },
+      "fallbackEpilogue": "Antony was at Caesar's side when the knives came out. Caesar survived, badly wounded. Rome fell into civil war a year early.",
+      "setsFlags": { "caesarAlive": true }
+    },
+    {
+      "id": "history_almost",
+      "priority": 5,
+      "title": "History Repeats (Almost)",
+      "condition": { "flag": "brutusChoice", "eq": "hesitate" },
+      "fallbackEpilogue": "Brutus never raised his knife. Caesar died anyway, with twenty-three wounds. History will still remember Brutus as his murderer.",
+      "fallbackDeathPoem": ["I crossed the Rubicon.", "I could not cross this room."],
+      "setsFlags": { "caesarAlive": false }
+    },
+    {
+      "id": "history_repeats",
+      "priority": 6,
+      "title": "History Repeats",
+      "fallbackEpilogue": "Caesar fell at the foot of Pompey's statue with twenty-three wounds. \"You too, my child?\" The Republic did not survive its saving.",
+      "fallbackDeathPoem": ["I crossed the Rubicon.", "I could not cross this room."],
+      "setsFlags": { "caesarAlive": false }
+    }
+  ],
+  "historyComparison": [
+    {
+      "question": "Did Caesar go to the Senate?",
+      "flag": "caesarWent",
+      "history": true,
+      "labels": { "true": "Yes", "false": "No" }
+    },
+    {
+      "question": "Did Caesar read the warning?",
+      "flag": "readNote",
+      "history": false,
+      "labels": { "true": "Yes", "false": "No" }
+    },
+    {
+      "question": "Was Antony at his side?",
+      "flag": "antonyPresent",
+      "history": false,
+      "labels": { "true": "Yes", "false": "No" }
+    },
+    {
+      "question": "What did Brutus do?",
+      "flag": "brutusChoice",
+      "history": "strike",
+      "labels": {
+        "strike": "Struck",
+        "warn": "Warned Caesar",
+        "hesitate": "Did nothing",
+        "null": "Never faced the choice"
+      }
+    },
+    {
+      "question": "Did Caesar survive?",
+      "flag": "caesarAlive",
+      "history": false,
+      "labels": { "true": "Yes", "false": "No" }
+    }
+  ]
+}

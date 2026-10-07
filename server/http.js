@@ -1,6 +1,6 @@
 // Helpers shared by the /api handlers.
 
-import { GameError } from './engine/applyAction.js';
+import { GameError } from './engine/errors.js';
 
 export function json(data, status = 200) {
   return Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });

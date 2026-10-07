@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button, ErrorText, Input } from '../components/ui.jsx';
 import { useRoomState } from '../hooks/useRoomState.js';
 import { joinRoom, sendAction } from '../lib/api.js';
 import { navigate } from '../lib/router.js';
 import { clearSession, loadName, loadSession, saveName, saveSession } from '../lib/session.js';
+import Ending from './Ending.jsx';
+import Game from './Game.jsx';
+import Lobby from './Lobby.jsx';
 
 export default function Room({ code }) {
   const [session, setSession] = useState(() => loadSession(code));
@@ -45,61 +48,55 @@ function JoinForm({ code, onJoined }) {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-4">
-      <h1 className="text-center text-2xl">
-        Join room <span className="font-mono font-bold tracking-widest text-amber-400">{code}</span>
+      <p className="label text-center">The Ides of March</p>
+      <h1 className="text-center font-display text-2xl">
+        Join room <span className="tracking-[0.25em] text-bronze-bright">{code}</span>
       </h1>
       <form onSubmit={join} className="flex flex-col gap-4">
+        <label className="sr-only" htmlFor="join-name">
+          Your name
+        </label>
         <Input
+          id="join-name"
           placeholder="Your name"
           maxLength={20}
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoFocus
         />
         <Button type="submit" disabled={busy || !name.trim()}>
           Join
         </Button>
       </form>
-      <ErrorText error={error} />
-      <button className="text-sm text-stone-400 underline" onClick={() => navigate('/')}>
+      <ErrorText error={error} className="text-center" />
+      <Button variant="ghost" onClick={() => navigate('/')}>
         Back to start
-      </button>
+      </Button>
     </main>
   );
 }
 
 function RoomView({ code, session, onLostSession }) {
-  const { view, setView, error } = useRoomState(code, session.token);
-  const [text, setText] = useState('');
-  const [actionError, setActionError] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const { view, receivedAt, setView, error } = useRoomState(code, session.token);
 
-  async function act(action) {
-    setActionError(null);
-    try {
-      const res = await sendAction(code, session.token, action);
-      setView(res.view);
-      return true;
-    } catch (err) {
-      setActionError(err);
-      return false;
-    }
-  }
-
-  async function copyInvite() {
-    const link = `${window.location.origin}/room/${code}`;
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      window.prompt('Copy this invite link:', link); // clipboard needs https; fallback for LAN
-    }
-  }
+  /** Sends an action; the response updates the screen at once. Never throws. */
+  const act = useCallback(
+    async (action) => {
+      try {
+        const res = await sendAction(code, session.token, action);
+        setView(res.view);
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, error: err };
+      }
+    },
+    [code, session.token, setView],
+  );
 
   if (error?.status === 404 || error?.status === 401) {
     return (
       <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-4 px-4 text-center">
-        <p>
+        <p className="text-lg">
           {error.status === 404
             ? 'This room does not exist or has expired.'
             : 'You are no longer a player in this room.'}
@@ -111,81 +108,10 @@ function RoomView({ code, session, onLostSession }) {
     );
   }
 
-  if (!view) return <p className="p-6 text-center text-stone-400">Connecting…</p>;
+  if (!view) return <p className="p-10 text-center text-marble-dim italic">Opening the doors…</p>;
 
-  const nameOf = (id) => view.players.find((p) => p.id === id)?.name ?? '?';
-
-  return (
-    <main className="mx-auto flex min-h-dvh max-w-lg flex-col gap-5 px-4 py-6">
-      <header className="flex items-center justify-between gap-2">
-        <div>
-          <p className="text-xs text-stone-400 uppercase">Room code</p>
-          <p className="font-mono text-3xl font-bold tracking-widest text-amber-400">{code}</p>
-        </div>
-        <Button className="bg-stone-700 text-stone-100 active:bg-stone-600" onClick={copyInvite}>
-          {copied ? 'Copied!' : 'Copy invite link'}
-        </Button>
-      </header>
-
-      <section className="rounded-lg bg-stone-800 p-4">
-        <p className="text-sm text-stone-400">Players ({view.players.length})</p>
-        <ul className="mt-1 flex flex-wrap gap-2">
-          {view.players.map((p) => (
-            <li
-              key={p.id}
-              className={`rounded px-2 py-1 ${p.id === view.you?.id ? 'bg-amber-500 text-stone-900' : 'bg-stone-700'}`}
-            >
-              {p.name}
-              {p.id === view.you?.id && ' (you)'}
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 text-sm text-stone-400">
-          Only you can see this — your secret number:{' '}
-          <span className="font-mono text-lg text-amber-300">{view.you?.secret}</span>
-        </p>
-      </section>
-
-      <section className="flex items-center justify-between rounded-lg bg-stone-800 p-4">
-        <div>
-          <p className="text-sm text-stone-400">Shared counter</p>
-          <p className="font-mono text-4xl">{view.counter}</p>
-        </div>
-        <Button onClick={() => act({ type: 'increment' })}>+1</Button>
-      </section>
-
-      <section className="flex flex-1 flex-col gap-3 rounded-lg bg-stone-800 p-4">
-        <ul className="flex max-h-80 flex-col gap-2 overflow-y-auto">
-          {view.messages.length === 0 && <li className="text-stone-500">No messages yet.</li>}
-          {view.messages.map((m) => (
-            <li key={m.id}>
-              <span className="font-semibold text-amber-300">{nameOf(m.playerId)}:</span> {m.text}
-            </li>
-          ))}
-        </ul>
-        <form
-          className="flex gap-2"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (await act({ type: 'say', text })) setText('');
-          }}
-        >
-          <Input
-            placeholder="Say something"
-            maxLength={200}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <Button type="submit" disabled={!text.trim()}>
-            Send
-          </Button>
-        </form>
-      </section>
-
-      <ErrorText
-        error={actionError ?? (error && { message: `Connection problem: ${error.message}` })}
-      />
-      <p className="text-center text-xs text-stone-500">version {view.version}</p>
-    </main>
-  );
+  const connection = error ? `Connection problem: ${error.message}` : null;
+  if (view.phase === 'lobby') return <Lobby view={view} act={act} connection={connection} />;
+  if (view.phase === 'ended') return <Ending view={view} act={act} />;
+  return <Game view={view} receivedAt={receivedAt} act={act} connection={connection} />;
 }

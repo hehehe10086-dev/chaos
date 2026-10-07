@@ -1,7 +1,7 @@
 // The shared conversation. A reading game: comfortable line length, clear speakers,
 // narrator lines centered and italic, private narrator lines marked as such.
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Medallion } from './Medallion.jsx';
 import { Button, ErrorText } from './ui.jsx';
 
@@ -111,15 +111,16 @@ function Message({ message: m, role, to, player, mine, showOriginal }) {
   );
 }
 
-export function Composer({ onSend, placeholder, disabled, hint, footer }) {
+/**
+ * The input row. It never grabs focus on its own (on a phone that would pop up the keyboard
+ * over the screen); after a send it keeps focus, so you can type the next line.
+ * busyHint: shown while a line is being sent (e.g. "The scribe is writing…").
+ */
+export function Composer({ onSend, placeholder, disabled, hint, footer, busyHint }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const inputRef = useRef(null);
-
-  useEffect(() => {
-    if (!busy) inputRef.current?.focus({ preventScroll: true });
-  }, [busy]);
 
   async function submit(e) {
     e.preventDefault();
@@ -131,6 +132,7 @@ export function Composer({ onSend, placeholder, disabled, hint, footer }) {
     setBusy(false);
     if (result.ok) setText('');
     else setError(result.error);
+    inputRef.current?.focus({ preventScroll: true });
   }
 
   return (
@@ -150,15 +152,18 @@ export function Composer({ onSend, placeholder, disabled, hint, footer }) {
           maxLength={200}
           autoComplete="off"
           disabled={disabled}
-          placeholder={busy ? 'The scribe is writing…' : placeholder}
-          className="min-h-12 w-full rounded-lg border border-ink-4 bg-ink px-4 text-[17px] text-marble placeholder:text-marble-faint focus:border-bronze focus:outline-none disabled:opacity-50"
+          readOnly={busy}
+          placeholder={placeholder}
+          className="min-h-12 w-full min-w-0 rounded-lg border border-ink-4 bg-ink px-4 text-[17px] text-marble placeholder:text-marble-faint read-only:text-marble-dim focus:border-bronze focus:outline-none disabled:opacity-50"
         />
         <Button type="submit" disabled={disabled || busy || !text.trim()}>
           Send
         </Button>
       </div>
       <div className="mx-auto mt-2 flex max-w-[42rem] flex-wrap items-center justify-between gap-2 text-sm text-marble-faint">
-        <span>{hint}</span>
+        <span>
+          {busy && busyHint ? <span className="text-bronze-bright italic">{busyHint}</span> : hint}
+        </span>
         {footer}
       </div>
       <ErrorText error={error} className="mx-auto mt-1 max-w-[42rem]" />

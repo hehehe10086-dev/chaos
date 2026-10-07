@@ -134,14 +134,20 @@ export default function Game({ view, receivedAt, act, connection }) {
           <Composer
             disabled={!myRole}
             placeholder={
-              myRole
-                ? `Speak as ${roleById[myRole.id]?.shortName}… (plain English is fine)`
-                : 'You are watching this game'
+              myRole ? `Speak as ${roleById[myRole.id]?.shortName}…` : 'You are watching this game'
             }
             onSend={(text) => act({ type: 'say', text })}
+            busyHint="The scribe is writing…"
             hint={
               connection ??
-              (myRole ? 'Name someone to speak to them.' : 'The next game will give you a role.')
+              (myRole ? (
+                // Phones have no room for it; the role card says the same before the game.
+                <span className="hidden sm:inline">
+                  Plain English is fine. Name someone to talk to them.
+                </span>
+              ) : (
+                'The next game will give you a role.'
+              ))
             }
             footer={
               myRole && (

@@ -36,11 +36,12 @@ export default function Lobby({ view, act, connection }) {
           <p className="label">{view.scenario.setting}</p>
           <h1 className="font-display text-3xl sm:text-4xl">{view.scenario.title}</h1>
         </div>
-        <div className="flex items-center gap-3">
+        {/* On a phone the invite box takes the full width and "How to play" wraps below it. */}
+        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 sm:w-auto">
+          <InviteBox code={view.code} />
           <Button variant="ghost" onClick={() => setRules(true)}>
             How to play
           </Button>
-          <InviteBox code={view.code} />
         </div>
       </header>
 
@@ -119,7 +120,7 @@ export default function Lobby({ view, act, connection }) {
               <p className="text-marble-dim">Waiting for {host?.name ?? 'the host'} to start…</p>
             )}
             <p className="text-sm text-marble-faint">
-              {view.players.length} of 5 seats taken by humans
+              {view.players.length} of {view.roles.length} seats taken by humans
             </p>
           </div>
           <ErrorText error={error} className="mt-3" />
@@ -176,13 +177,13 @@ function InviteBox({ code }) {
     }
   }
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-ink-4 bg-ink-2 py-1 pr-1 pl-4">
+    <div className="flex w-full items-center justify-between gap-3 rounded-lg border border-ink-4 bg-ink-2 py-1 pr-1 pl-4 sm:w-auto">
       <div>
         <p className="label text-[0.6rem]">Room code</p>
         <p className="font-display text-2xl tracking-[0.25em] text-bronze-bright">{code}</p>
       </div>
       <Button variant="quiet" onClick={copy}>
-        {copied ? 'Copied!' : 'Copy invite link'}
+        {copied ? 'Copied!' : 'Copy link'}
       </Button>
     </div>
   );

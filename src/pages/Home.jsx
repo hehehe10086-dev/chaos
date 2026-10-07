@@ -63,7 +63,7 @@ export default function Home() {
               knives under their togas. Play Caesar, Brutus, Cassius, Calpurnia or Mark Antony — the
               AI plays everyone else.
             </p>
-            <p className="label">1–5 players · about 10 minutes · no sign-up</p>
+            <p className="label">1–5 players · about 10&nbsp;minutes · no&nbsp;sign-up</p>
             <form
               className="flex flex-col gap-3 sm:flex-row"
               onSubmit={(e) => {

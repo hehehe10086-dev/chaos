@@ -4,11 +4,11 @@
 
 import { randomInt } from 'node:crypto';
 import { waitUntil } from '@vercel/functions';
-import { rewriteLine } from './ai/tasks.js';
+import { rewriteLine, takeoverRecap } from './ai/tasks.js';
 import { runWorker } from './ai/worker.js';
 import { hashToken, newId, newRoomCode, newToken } from './auth.js';
 import { readyTask } from './engine/agents.js';
-import { applyAction, tooSoon } from './engine/applyAction.js';
+import { applyAction, checkTakeover, tooSoon } from './engine/applyAction.js';
 import { GameError } from './engine/errors.js';
 import { advance, gameTime } from './engine/game.js';
 import { cleanText, createRoomState, roleOfPlayer } from './engine/state.js';
@@ -109,11 +109,32 @@ async function prepareSay(code, token, action, now) {
   return { type: 'say', text: rewritten, original: text };
 }
 
+/** Writes the takeover recap before the state update. The engine checks everything again. */
+async function prepareTakeover(code, token, action, now) {
+  const room = await loadRoom(code);
+  const player = authenticate(room.state, token);
+  const scenario = getScenario(room.state.scenarioId);
+  // Bring the story up to date first (pure, nothing is written), so the recap is current.
+  const state = advance(room.state, scenario, now, latestPresence(room.presence));
+  const roleId = String(action.roleId ?? '');
+  checkTakeover(state, scenario, player.id, roleId); // fail fast: no LLM call for a doomed request
+  const recap = await takeoverRecap(state, scenario, roleId, now);
+  return { type: 'takeover', roleId, recap };
+}
+
+// Slow work (LLM) done before the compare-and-set loop. Each rebuilds the action from scratch,
+// so a client can never smuggle in server-only fields (a rewrite's original, a recap).
+const PREPARE = new Map([
+  ['say', prepareSay],
+  ['takeover', prepareTakeover],
+]);
+
 export async function performAction(code, token, action, options = {}) {
   let now = options.now ?? Date.now();
-  if (action.type === 'say') {
-    action = await prepareSay(code, token, action, now);
-    if (options.now == null) now = Date.now(); // the rewrite took time
+  const prepare = PREPARE.get(action.type);
+  if (prepare) {
+    action = await prepare(code, token, action, now);
+    if (options.now == null) now = Date.now(); // the LLM took time
   }
 
   let playerId;

@@ -13,8 +13,9 @@ vi.mock('../server/llm/anthropic.js', () => ({
 }));
 
 const { complete, completeJson, llmConfig } = await import('../server/llm/index.js');
-const { aiDecision, rewriteLine } = await import('../server/ai/tasks.js');
+const { aiDecision, rewriteLine, takeoverRecap } = await import('../server/ai/tasks.js');
 const { getScenario } = await import('../server/scenarios.js');
+const { tidyLine, tidyParagraph } = await import('../server/ai/text.js');
 const { createMemoryStore } = await import('../server/store/memory.js');
 
 const useFakeAnthropic = () => {
@@ -163,6 +164,49 @@ describe('timeouts, caps and fallbacks', () => {
     };
     const task = { type: 'decide', decisionId: 'go_to_senate', roleId: 'caesar' };
     expect(await aiDecision(state, scenario, task, 280_000)).toEqual({ optionId: 'go', line: '' });
+  });
+
+  it("takeover recap: the model's three lines, or a recap built from the timeline", async () => {
+    useFakeAnthropic();
+    const scenario = getScenario();
+    const state = {
+      messages: [
+        { id: 'm1', kind: 'narration', text: 'A messenger arrives.', visibleTo: 'all' },
+        { id: 'm2', kind: 'narration', text: 'Calpurnia only.', visibleTo: ['calpurnia'] },
+      ],
+      game: { timeScale: 1, startedAt: 0, pausedMs: 0, acts: [{ id: 'house', variant: null }] },
+    };
+    fake.reply = async () =>
+      '{"happened": "Caesar is leaving.", "secret": "You smell a plot.", "goal": "Stay at his side."}';
+    expect(await takeoverRecap(state, scenario, 'antony', 200_000)).toEqual({
+      happened: 'Caesar is leaving.',
+      secret: 'You smell a plot.',
+      goal: 'Stay at his side.',
+    });
+
+    fake.reply = async () => {
+      throw new Error('provider down');
+    };
+    expect(await takeoverRecap(state, scenario, 'antony', 200_000)).toEqual({
+      happened: 'Act 2, The House. A messenger arrives.', // not Calpurnia's private line
+      secret: scenario.roleById.get('antony').secret,
+      goal: scenario.roleById.get('antony').goal,
+    });
+  });
+
+  it('keeps the quotes and colons that belong to a line', () => {
+    const cry = 'In the street, a soothsayer cries out: "Beware the Ides of March."';
+    expect(tidyLine(cry)).toBe(cry);
+    expect(tidyLine('A messenger arrives: the Senate is waiting.')).toBe(
+      'A messenger arrives: the Senate is waiting.',
+    );
+    expect(tidyLine('Hear me: Rome waits.')).toBe('Hear me: Rome waits.');
+    expect(tidyLine('Mark Antony: Rome waits.')).toBe('Rome waits.');
+    expect(tidyLine('“Rome waits.”')).toBe('Rome waits.');
+    expect(tidyParagraph('He fell. "You too, my child?"')).toBe('He fell. "You too, my child?"');
+    expect(tidyParagraph('"He fell at the foot of the statue."')).toBe(
+      'He fell at the foot of the statue.',
+    );
   });
 
   it('cleans a model line: no name label, no wrapping quotes, at most two sentences', async () => {

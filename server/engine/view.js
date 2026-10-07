@@ -85,6 +85,7 @@ function gameView(state, scenario, now, playerId, myRoleId) {
   const role = myRoleId ? scenario.roleById.get(myRoleId) : null;
   const t = ended ? scenario.meta.durationSeconds : gameTime(game, now);
   const myDecision = game.openDecisions.find((d) => d.roleId === myRoleId);
+  const recap = role ? game.roles[role.id].recap : null;
 
   return {
     id: game.id,
@@ -97,6 +98,8 @@ function gameView(state, scenario, now, playerId, myRoleId) {
       secret: role.secret,
       goal: role.goal,
       facts: role.knows.map((id) => scenario.factById.get(id).text),
+      // "Previously…" for a player who took this role over from the AI mid-game.
+      recap: recap ? { happened: recap.happened, secret: recap.secret, goal: recap.goal } : null,
     },
     decision: myDecision ? decisionView(scenario, myDecision) : null,
     // Public: who is deciding right now (not the options).

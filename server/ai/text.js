@@ -9,27 +9,39 @@ export function firstSentences(text, count) {
 }
 
 /**
+ * Removes quotes around the whole text ("…", “…”, ‘…’), but never a quote that belongs to it:
+ * `He cries: "Beware."` keeps its closing quote.
+ */
+function unquote(text) {
+  const match = text.match(/^["“]([^"“”]*)["”]$/) ?? text.match(/^['‘]([^'‘’]*)['’]$/);
+  return (match ? match[1] : text).trim();
+}
+
+/** A speaker label like "Brutus:" or "Mark Antony:" — not "Hear me:" or "A messenger arrives:". */
+const SPEAKER_LABEL = /^[A-Z][\w'-]*(?: [A-Z][\w'-]*){0,2}:\s+/;
+
+/**
  * Cleans a model's line of dialogue: drops a leading "Name:" label and wrapping quotes,
  * keeps at most `maxSentences`, and caps the length at a word boundary.
  */
 export function tidyLine(text, { maxSentences = 2, maxChars = 300 } = {}) {
-  const unquote = (s) => s.replace(/^["“'‘]+|["”'’]+$/g, '').trim();
   let out = unquote(
     String(text ?? '')
       .replace(/\s+/g, ' ')
       .trim(),
   );
-  out = unquote(out.replace(/^[A-Z][\w .'-]{0,30}:\s+/, '')); // "Brutus: ..." → "..."
+  out = unquote(out.replace(SPEAKER_LABEL, '')); // "Brutus: ..." → "..."
   out = firstSentences(out, maxSentences);
   if (out.length > maxChars) out = `${out.slice(0, maxChars).replace(/\s+\S*$/, '')}…`;
   return out;
 }
 
 export function tidyParagraph(text, maxChars = 900) {
-  const out = String(text ?? '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/^["“]+|["”]+$/g, '');
+  const out = unquote(
+    String(text ?? '')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
   return out.length > maxChars ? `${out.slice(0, maxChars).replace(/\s+\S*$/, '')}…` : out;
 }
 

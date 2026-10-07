@@ -16,6 +16,29 @@ export function tooSoon(player, now) {
 }
 
 /**
+ * Throws unless this player may take over this role now: the game is running, the role is
+ * played by the AI and is not in the middle of a decision, and the player has no role yet.
+ * The server also calls it before writing the recap, so a doomed request never reaches the LLM.
+ */
+export function checkTakeover(state, scenario, playerId, roleId) {
+  if (state.phase !== 'playing') {
+    throw new GameError('You can take over a character only while the day is running', 409);
+  }
+  const role = scenario.roleById.get(roleId);
+  if (!role) throw new GameError('Unknown role');
+  const game = state.game;
+  const mine = roleOfPlayer(game, playerId);
+  if (mine) throw new GameError(`You already play ${scenario.roleById.get(mine).name}`, 409);
+  if (!agents.isAi(game, roleId)) {
+    const holder = state.players.find((p) => p.id === game.roles[roleId].playerId);
+    throw new GameError(`${holder?.name ?? 'Someone'} already plays ${role.name}`, 409);
+  }
+  if (game.openDecisions.some((d) => d.roleId === roleId)) {
+    throw new GameError(`${role.shortName} is making a decision — try again in a moment`, 409);
+  }
+}
+
+/**
  * @param {object} state
  * @param {{type: string, [key: string]: any}} action
  * @param {{scenario: object, now: number, playerId?: string, timeScale?: number, hostAway?: boolean}} ctx
@@ -109,6 +132,26 @@ export function applyAction(state, action, ctx) {
         at: now,
       });
       agents.onSpeech(draft, scenario, message);
+      return draft;
+    }
+
+    case 'takeover': {
+      // A player who joined after the start takes an AI role. action.recap is written by the
+      // server (rooms.js prepareTakeover), never taken from the client.
+      const player = requirePlayer(draft, ctx.playerId);
+      checkTakeover(draft, scenario, player.id, action.roleId);
+      const game = draft.game;
+      const role = scenario.roleById.get(action.roleId);
+      game.roles[role.id].playerId = player.id;
+      game.roles[role.id].recap = action.recap ?? null;
+      game.agents[role.id].pending = null; // a line the AI was about to say is dropped
+      player.pick = role.id; // "Play again" keeps the role
+      addMessage(draft, {
+        kind: 'system',
+        text: `${player.name} takes over ${role.name}.`,
+        t: gameTime(game, now),
+        at: now,
+      });
       return draft;
     }
 

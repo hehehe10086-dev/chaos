@@ -7,6 +7,7 @@ import { shuffled } from '../engine/random.js';
 import { complete, completeJson } from '../llm/index.js';
 import { agentPrompt, decisionPrompt } from '../prompts/agent.js';
 import { deathPoemPrompt, epiloguePrompt } from '../prompts/epilogue.js';
+import { recapPrompt } from '../prompts/recap.js';
 import { rewritePrompt } from '../prompts/rewrite.js';
 import { leadingVocative, lowerFirst, mockRewrite, opensWithAddress } from './mockStyle.js';
 import { parsePoem, tidyLine, tidyParagraph } from './text.js';
@@ -129,6 +130,64 @@ export async function aiDecision(state, scenario, task, now) {
   } catch (error) {
     warn('decision', error);
     return { optionId: decision.historicalOptionId, line: '' };
+  }
+}
+
+/** A takeover recap without the LLM: where the day is, the latest events this role saw, its card. */
+export function fallbackRecap(state, scenario, roleId) {
+  const role = scenario.roleById.get(roleId);
+  const act = currentAct(scenario, state.game);
+  const seen = state.messages.filter(
+    (m) => m.kind === 'narration' && (m.visibleTo === 'all' || m.visibleTo.includes(roleId)),
+  );
+  const latest = seen
+    .slice(-2)
+    .map((m) => m.text)
+    .join(' ');
+  const where = act ? `Act ${act.number}, ${act.title}.` : 'The day is beginning.';
+  return {
+    happened: `${where} ${latest || 'Nothing has happened yet.'}`,
+    secret: role.secret,
+    goal: role.goal,
+  };
+}
+
+const RecapSchema = z.object({
+  happened: z.string().trim().min(1).max(800),
+  secret: z.string().trim().min(1).max(800),
+  goal: z.string().trim().min(1).max(800),
+});
+
+/** "Previously…" for a player who takes a role over mid-game. Fallback: fallbackRecap(). */
+export async function takeoverRecap(state, scenario, roleId, now) {
+  const fallback = () => fallbackRecap(state, scenario, roleId);
+  try {
+    const game = state.game;
+    const { system, messages } = recapPrompt(
+      state,
+      scenario,
+      roleId,
+      currentAct(scenario, game),
+      gameTime(game, now),
+    );
+    const out = await completeJson({
+      system,
+      messages,
+      tier: 'fast',
+      maxTokens: 350,
+      schema: RecapSchema,
+      mock: fallback,
+    });
+    // Limits are a safety net for runaway output; the prompt asks for two sentences each.
+    const recap = {
+      happened: tidyLine(out.happened, { maxSentences: 6, maxChars: 420 }),
+      secret: tidyLine(out.secret, { maxSentences: 3, maxChars: 280 }),
+      goal: tidyLine(out.goal, { maxSentences: 3, maxChars: 280 }),
+    };
+    return recap.happened && recap.secret && recap.goal ? recap : fallback();
+  } catch (error) {
+    warn('takeover recap', error);
+    return fallback();
   }
 }
 

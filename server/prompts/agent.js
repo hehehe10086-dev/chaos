@@ -62,7 +62,8 @@ export function transcriptFor(state, scenario, roleId, limit = TRANSCRIPT_LINES)
   return lines.length ? lines.join('\n') : '(nothing has been said yet)';
 }
 
-function situation(scenario, act, t) {
+/** "Now: Act 2, "The House". About 6 minute(s) of the day remain." */
+export function situation(scenario, act, t) {
   const left = Math.max(0, Math.round(scenario.meta.durationSeconds - t));
   return act
     ? `Now: Act ${act.number}, "${act.title}". About ${Math.ceil(left / 60)} minute(s) of the day remain.`

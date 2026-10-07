@@ -5,6 +5,7 @@ import { Composer, MessageList } from '../components/Chat.jsx';
 import { DecisionModal } from '../components/DecisionModal.jsx';
 import { RoleCard, RoleSecrets } from '../components/RoleCard.jsx';
 import { RulesDialog } from '../components/RulesDialog.jsx';
+import { TAKEOVER_LIST_ID, TakeoverPanel } from '../components/TakeoverPanel.jsx';
 import { Button } from '../components/ui.jsx';
 import { useGameClock } from '../hooks/useGameClock.js';
 import { clockText, roman } from '../lib/format.js';
@@ -64,6 +65,13 @@ export default function Game({ view, receivedAt, act, connection }) {
     [act],
   );
 
+  // Spectators: open the panel with the "Take over" buttons (a tab on phones) and focus it,
+  // once React has shown it.
+  const showTakeover = () => {
+    setTab('role');
+    setTimeout(() => document.querySelector(`#${TAKEOVER_LIST_ID} button:not(:disabled)`)?.focus());
+  };
+
   const actLeft = game.act ? game.act.endsAt - t : 0;
   const dayLeft = game.clock.duration - t;
 
@@ -96,7 +104,7 @@ export default function Game({ view, receivedAt, act, connection }) {
         {[
           ['story', 'Story'],
           ['cast', 'Cast'],
-          ['role', myRole ? 'Your role' : 'About'],
+          ['role', myRole ? 'Your role' : 'Join'],
         ].map(([id, label]) => (
           <button
             key={id}
@@ -146,7 +154,13 @@ export default function Game({ view, receivedAt, act, connection }) {
                   Plain English is fine. Name someone to talk to them.
                 </span>
               ) : (
-                'The next game will give you a role.'
+                <button
+                  type="button"
+                  onClick={showTakeover}
+                  className="min-h-10 text-bronze-bright underline underline-offset-4 hover:text-marble"
+                >
+                  Take over a character
+                </button>
               ))
             }
             footer={
@@ -176,10 +190,7 @@ export default function Game({ view, receivedAt, act, connection }) {
               <RoleSecrets role={myRole} />
             </>
           ) : (
-            <p className="text-marble-dim">
-              You joined after the day began, so you are watching. Everyone&apos;s secrets are
-              revealed at the end.
-            </p>
+            <TakeoverPanel view={view} act={act} onTakenOver={() => setTab('story')} />
           )}
         </aside>
       </div>

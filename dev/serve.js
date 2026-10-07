@@ -1,6 +1,8 @@
 // `npm start`: a production-like local server. Serves the built client from dist/ and the
 // /api functions, as one service. (Vercel deploys the same files without this script.)
 //   npm run build && npm start      → http://localhost:3000  (PORT to change)
+//   npm run start:offline           → the same, but in-memory store + mock LLM (like dev:offline);
+//                                     also reads .env.offline.local first (e.g. TIME_SCALE=0.2)
 
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -8,10 +10,18 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { handleApi } from './api-dispatch.js';
 
-try {
-  process.loadEnvFile('.env');
-} catch {
-  // no .env: in-memory store and mock LLM
+const offline = process.argv.includes('--offline');
+// loadEnvFile never overwrites a variable that is already set, so earlier files (and the shell) win.
+for (const file of offline ? ['.env.offline.local', '.env'] : ['.env']) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // no such file: in-memory store and mock LLM
+  }
+}
+if (offline) {
+  process.env.CHAOS_STORE = 'memory';
+  process.env.LLM_PROVIDER = 'mock';
 }
 
 const root = process.cwd();
@@ -36,11 +46,16 @@ const TYPES = {
 
 const loadModule = (p) => import(pathToFileURL(path.join(root, p)).href);
 
-const server = createServer(async (req, res) => {
-  if (await handleApi(req, res, loadModule)) return;
-
-  const { pathname } = new URL(req.url, 'http://localhost');
-  let file = path.resolve(dist, `.${decodeURIComponent(pathname)}`);
+function serveStatic(req, res) {
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+  } catch {
+    res.statusCode = 400; // e.g. "/%" — malformed percent-encoding
+    res.end('Bad request');
+    return;
+  }
+  let file = path.resolve(dist, `.${pathname}`);
   if (file !== dist && !file.startsWith(dist + path.sep)) {
     res.statusCode = 403;
     res.end('Forbidden');
@@ -54,7 +69,20 @@ const server = createServer(async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }
   createReadStream(file).pipe(res);
+}
+
+const server = createServer(async (req, res) => {
+  // One bad request must never take the whole server down.
+  try {
+    if (!(await handleApi(req, res, loadModule))) serveStatic(req, res);
+  } catch (err) {
+    console.error(err);
+    if (!res.headersSent) res.statusCode = 500;
+    res.end();
+  }
 });
 
 const port = Number(process.env.PORT) || 3000;
-server.listen(port, () => console.log(`Chaos is running at http://localhost:${port}`));
+server.listen(port, () =>
+  console.log(`Chaos is running at http://localhost:${port}${offline ? ' (offline mode)' : ''}`),
+);

@@ -29,3 +29,5 @@ One line each: decision — why. Newest at the bottom.
 - Tests use a fixed seed (`options.seed`); real rooms use a random seed.
 - No images and no Wikimedia downloads: portraits are SVG coins (metal derived from `portraitKey`) — downloading third-party files needs Yuqi's explicit OK, and the brief marks it optional.
 - Anti-spam cooldown (1.5 s per player) ignores out-of-order clocks, so a retried write or another server's clock never counts as spam.
+- `npm run start:offline` (= `node dev/serve.js --offline`): the production build with the in-memory store + mock LLM, reading `.env.offline.local` first — `.env` holds the real Redis credentials, and verifying the build should not need them.
+- `dev/serve.js` answers a malformed URL (e.g. `/%`) with 400 and wraps every request in try/catch — one bad request used to crash `npm start` (unhandled rejection).

@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "dev:offline": "vite --mode offline",
-    "start": "node dev/serve.js"
+    "start": "node dev/serve.js",
+    "start:offline": "node dev/serve.js --offline"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

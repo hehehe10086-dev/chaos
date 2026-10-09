@@ -1,6 +1,19 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "dev", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 }
+    { "name": "dev", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    {
+      "name": "offline",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:offline", "--", "--port", "5174", "--strictPort"],
+      "port": 5174
+    },
+    { "name": "start", "runtimeExecutable": "npm", "runtimeArgs": ["start"], "port": 3000 },
+    {
+      "name": "start-offline",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:offline"],
+      "port": 3000
+    }
   ]
 }

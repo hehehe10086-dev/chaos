@@ -11,12 +11,18 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:offline": "vite --mode offline",
+    "start": "node dev/serve.js",
+    "start:offline": "node dev/serve.js --offline"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@upstash/redis": "^1.39.0",
+    "@vercel/functions": "^3.9.11",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

@@ -9,4 +9,7 @@ export default defineConfig({
     // Listen on the LAN too, so a phone on the same Wi-Fi can open the dev server.
     host: true,
   },
+  test: {
+    setupFiles: ['tests/setup.js'],
+  },
 });

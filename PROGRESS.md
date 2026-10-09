@@ -2,27 +2,25 @@
 
 ## Current status
 
-M1 sync sandbox is committed on branch `feat/m1-sync` (not pushed). Verified by Claude locally with the in-memory store: create room → 4-letter code → second player joins → shared counter + messages sync via polling within ~2s; refresh keeps identity; 20 concurrent increments lose nothing; 9 vitest tests pass.
-Yuqi verified locally on 2026-10-05 with the in-memory store and then with real Upstash Redis (rooms survive a dev-server restart). NOT yet verified: M1 on Vercel; real phone.
-`main` = scaffold only, live at https://chaos-ten-hazel.vercel.app/ (`/api/health` OK).
+Branch `mvp-caesar` (pushed 2026-10-08, not merged yet): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). Since 2026-10-08 a classmate develops and tests — see `HANDOFF.md`. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
 
 ## Decisions
 
 - State store: Upstash Redis (single region, us-east-1) + polling; conditional writes via Lua on `version`
-- LLM: behind an adapter (`server/llm/client.js`); Claude Haiku 4.5 candidate, compared against Gemini Flash in W1
+- LLM: behind an adapter (`server/llm/index.js`): Anthropic (Haiku 4.5 fast + Sonnet 5.5 smart) by default, OpenAI optional, deterministic mock offline
 - Language: JavaScript (+ JSDoc where types help)
-- First story: B-59 submarine, Cuban Missile Crisis, Oct 1962
-- AI voting: each AI seat has a numeric `lean` set by rules; each round an LLM structured judgment may shift it by at most ±1; the vote is a threshold on `lean`
+- First story: The Ides of March (the B-59 idea is shelved — see `DECISIONS.md`)
+- Decisions instead of votes: at fixed points one character chooses (AI: persona-weighted or LLM choice); endings come from game rules, never from the LLM
 
 ## In progress
 
-- Yuqi — branch `feat/m1-sync`: room create/join, seatToken auth, CAS writes, polling, per-player view
+- Yuqi — owner-only steps in `HANDOFF.md` §1: invite the classmate, share Vercel Previews, API key (branch already pushed)
+- Classmate — from 2026-10-08: setup and local testing (`HANDOFF.md` §2, `TESTING.md`)
 
 ## Next (by priority)
 
-1. PR for `feat/m1-sync` is open and Redis is connected to the Vercel project: redeploy the Preview, test with laptop + real phone, then merge
-2. Write `docs/api.md` together (actions + per-seat view JSON + fixtures)
-3. In parallel: `docs/spec.md` (first story script), Era Voice model comparison
+The dated plan is in `HANDOFF.md` §3: Preview test on a laptop + real phone → merge → real-AI playtests and
+prompt tuning → playtest with someone new → feature freeze 10/27 → submit 10/29.
 
 ## Milestones
 
@@ -33,12 +31,15 @@ Yuqi verified locally on 2026-10-05 with the in-memory store and then with real 
 
 ## Open questions / known issues
 
-- Split of work between Yuqi and teammate (backend vs frontend)
-- LLM billing account and daily budget cap
+- ~~Split of work between Yuqi and teammate~~ — 2026-10-08: the classmate develops and tests, Yuqi owns accounts (`HANDOFF.md`)
+- LLM billing account and daily budget cap (Yuqi; `LLM_DAILY_CAP` defaults to 3000 calls/day)
 - Verify whether Upstash archives inactive free databases
 
 ## Log
 
+- 2026-10-08 Claude — handoff to a classmate: `HANDOFF.md` rewritten for a human teammate (owner-only steps, day one, dated plan), `TESTING.md` (manual test plan + bug template + log), `docs/submission.md` + `docs/art-list.md` (title, description, cover image brief). Pushed `mvp-caesar` to GitHub.
+- 2026-10-06 Claude (evening) — `npm start` verified (fixed: a malformed URL crashed it; added `start:offline`); phone-width pass (fixed lobby overflow, composer focus/placeholder, role card height); README run / API key / new scenario; OpenAI defaults → GPT-6 (+ reasoning-effort fix); M5: takeover with recap, Tab assist, voice input; fixed long era-voice rewrites being rejected and `tidyLine` dropping closing quotes. 74 tests.
+- 2026-10-06 Claude — MVP on `mvp-caesar`: scenario JSON + schema, timeline engine, AI agents + worker, LLM adapter (mock/Anthropic/OpenAI), lobby/game/ending UI; STATUS.md written. Yuqi now works solo; B-59 shelved for the Ides of March.
 - 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.
 - 2026-10-05 Claude — wrote HANDOFF.md (handoff to another AI tool).
 - 2026-10-05 Yuqi — M1 sync sandbox: /api/room, /api/state, /api/action; memory + Redis stores; 9 tests.

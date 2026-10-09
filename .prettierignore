@@ -3,3 +3,4 @@ node_modules
 package-lock.json
 README*.md
 .claude/settings.local.json
+CHAOS_MVP_BRIEF.md

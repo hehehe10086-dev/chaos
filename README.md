@@ -203,6 +203,7 @@ Tips:
 - **Phone on the same Wi-Fi:** the dev server listens on your LAN — open `http://<your computer's IP>:5173` on the phone.
 - **A faster day for testing:** create `.env.offline.local` (gitignored) with `TIME_SCALE=0.2` → the 10-minute day takes 2 minutes. Delete it afterwards.
 - **Upstash Redis:** set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in `.env` (see `.env.example`). On Vercel the Upstash integration provides them. Without them, local runs use the in-memory store.
+- **Manual test plan** (what to check on real devices, how to report a bug): [`TESTING.md`](TESTING.md).
 
 ### Add an API key (real AI)
 

@@ -2,7 +2,8 @@
 
 Multiplayer historical role-play party game for the Handshake AI Skills Studio Multiplayer Game Challenge.
 **Deadline: 2026-10-30 11:59 PM PT.** Feature freeze 10/27, target submission 10/29.
-Yuqi builds it alone (the teammate is credited but not active).
+Yuqi owns it (GitHub repo, Vercel, API keys, the submission); since 2026-10-08 a classmate does the
+development and testing — see `HANDOFF.md`.
 
 ## Where things are
 
@@ -10,7 +11,8 @@ Yuqi builds it alone (the teammate is credited but not active).
 - `CHAOS_MVP_BRIEF.md` — the MVP spec (scenario #1 "The Ides of March"). `PLAN.md` — how it is built.
 - `DECISIONS.md` — every judgment call, one line each. Add to it when you decide something.
 - `README.md` — original design doc. `README.zh-CN.md` is a personal translation; do not keep it in sync.
-- `PROGRESS.md` — short dated log. `HANDOFF.md` — pointer for a new AI/tool taking over.
+- `PROGRESS.md` — short dated log. `HANDOFF.md` — who does what, the plan to the deadline, how to start.
+- `TESTING.md` — manual test plan, bug-report template, test log. `docs/submission.md` — contest submission kit.
 - `scenarios/*.json` — all story content (validated by `shared/scenarioSchema.js`).
 
 ## Commands
@@ -55,13 +57,14 @@ Locally they are served by `dev/api-dispatch.js`; on Vercel the same files run a
 
 - `main` is always playable. Work on branches and merge via Pull Request.
 - Commit after each working step. Message format: `feat: …`, `fix: …`, `docs: …`, `chore: …`.
-- Ask Yuqi before pushing. Never force-push or rewrite history.
+- Ask the person you are working with before pushing. Never force-push or rewrite history.
 - Line endings are enforced by `.gitattributes` (LF).
 
-## Working with Yuqi
+## Working with the team
 
-- Reply in Chinese; keep technical terms in English.
-- Yuqi is learning git: explain each git operation and key decision in one or two sentences.
+- With Yuqi: reply in Chinese and keep technical terms in English. Yuqi is learning git: explain each git
+  operation and key decision in one or two sentences.
+- With the classmate: ask how they like to work (language, level of detail) if it is not clear.
 - Small steps: after each step, give localhost verification steps.
 - For anything that changes over time (pricing, model names, free tiers, API usage), look it up — don't rely on memory.
 

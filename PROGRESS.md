@@ -2,7 +2,7 @@
 
 ## Current status
 
-Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). See `STATUS.md` for details, what is verified, and "Needs Yuqi". `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
+Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). Since 2026-10-08 a classmate develops and tests — see `HANDOFF.md`. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
 
 ## Decisions
 
@@ -14,13 +14,13 @@ Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BR
 
 ## In progress
 
-- Yuqi — review and push `mvp-caesar`, open the PR, test the Vercel Preview; add an Anthropic key
+- Yuqi — owner-only steps in `HANDOFF.md` §1: push `mvp-caesar`, invite the classmate, share Vercel Previews, API key
+- Classmate — from 2026-10-08: setup and local testing (`HANDOFF.md` §2, `TESTING.md`)
 
 ## Next (by priority)
 
-1. Push + PR + Vercel Preview on a laptop and a real phone, then merge
-2. With a real key: play a full game, read the transcript, tune prompts and check the cost
-3. Real-phone checks: takeover from a second phone, "Ideas", voice input
+The dated plan is in `HANDOFF.md` §3: Preview test on a laptop + real phone → merge → real-AI playtests and
+prompt tuning → playtest with someone new → feature freeze 10/27 → submit 10/29.
 
 ## Milestones
 
@@ -31,12 +31,13 @@ Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BR
 
 ## Open questions / known issues
 
-- Split of work between Yuqi and teammate (backend vs frontend)
-- LLM billing account and daily budget cap
+- ~~Split of work between Yuqi and teammate~~ — 2026-10-08: the classmate develops and tests, Yuqi owns accounts (`HANDOFF.md`)
+- LLM billing account and daily budget cap (Yuqi; `LLM_DAILY_CAP` defaults to 3000 calls/day)
 - Verify whether Upstash archives inactive free databases
 
 ## Log
 
+- 2026-10-08 Claude — handoff to a classmate: `HANDOFF.md` rewritten for a human teammate (owner-only steps, day one, dated plan), `TESTING.md` (manual test plan + bug template + log), `docs/submission.md` + `docs/art-list.md` (title, description, cover image brief). Nothing pushed yet.
 - 2026-10-06 Claude (evening) — `npm start` verified (fixed: a malformed URL crashed it; added `start:offline`); phone-width pass (fixed lobby overflow, composer focus/placeholder, role card height); README run / API key / new scenario; OpenAI defaults → GPT-6 (+ reasoning-effort fix); M5: takeover with recap, Tab assist, voice input; fixed long era-voice rewrites being rejected and `tidyLine` dropping closing quotes. 74 tests.
 - 2026-10-06 Claude — MVP on `mvp-caesar`: scenario JSON + schema, timeline engine, AI agents + worker, LLM adapter (mock/Anthropic/OpenAI), lobby/game/ending UI; STATUS.md written. Yuqi now works solo; B-59 shelved for the Ides of March.
 - 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.

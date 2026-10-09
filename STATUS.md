@@ -1,6 +1,10 @@
-# Status — branch `mvp-caesar` (2026-10-06, evening)
+# Status — branch `mvp-caesar` (2026-10-08)
 
 Spec: `CHAOS_MVP_BRIEF.md` · Plan: `PLAN.md` · Judgment calls: `DECISIONS.md` · Rules for AIs: `CLAUDE.md`
+· **Who does what next, and the plan to the deadline: `HANDOFF.md`** · Test plan: `TESTING.md`
+
+> 2026-10-08: development and testing are handed to a classmate; Yuqi keeps the repo, Vercel, keys and
+> the submission. Nothing has been pushed yet — every commit below is still only on Yuqi's laptop.
 
 ## Summary
 
@@ -131,26 +135,24 @@ tests/                        setup (memory + mock), harness (fake clock, full p
   Upstash Free = 500K/month.
 - No TypeScript type-check (Yuqi chose JavaScript); `vite build` + tests are the checks.
 
-## Next steps (in order)
+## Next steps
 
-1. Yuqi: push, open the PR, test the Vercel Preview on a laptop + real phone (see "Needs Yuqi").
-2. With a real key: play one full game, read the transcript, tune prompts (rewrite length, agent tone,
-   recap and suggestion quality); check the cost per game in the Anthropic console.
-3. Real phone: takeover from a second phone, Tab assist via "Ideas", voice input (Android Chrome, iOS Safari).
-4. Ideas if time allows: AI stand-in on disconnect; a short "how to play" hint for first-time spectators;
-   a second story (then a story picker on the home page).
+The dated plan to the deadline is in `HANDOFF.md`, section 3. In short: push and open the PR → test the
+Vercel Preview on a laptop and a real phone (`TESTING.md`) → merge → add the API key in Vercel and playtest
+with real AI, tuning the prompts → playtest with someone new → feature freeze 10/27 → submit 10/29.
+Optional if time allows: AI stand-in on disconnect; a short hint for first-time spectators; a second story
+with a story picker.
 
-## Needs Yuqi
+## Needs Yuqi (owner-only — details in `HANDOFF.md`, section 1)
 
-1. **Review and push** this branch (all its commits are local): `git push -u origin mvp-caesar`, open a PR
-   on GitHub, test the Vercel Preview on a laptop + phone, then merge.
-2. **Real AI (recommended for judging):** create an Anthropic API key and set a monthly spend limit in the
-   console. In the local `.env`, **replace `LLM_MODE=mock`** (an old name the code ignores) with
-   `LLM_PROVIDER=anthropic`, and fill in `ANTHROPIC_API_KEY=…`; add the same two variables in Vercel →
-   Settings → Environment Variables (Production + Preview), then redeploy. Never paste the key into chat.
-   Estimate: roughly $0.3–0.6 per 10-minute game.
-3. Delete the obsolete remote branches `docs/teammate-handoff` and `feat/m1-sync`.
-4. On a real phone (the Vercel URL, HTTPS): try "Speak" once and allow the microphone.
+1. **Push** the branch: `git push -u origin mvp-caesar` (all its commits are local).
+2. **Invite the classmate** as a collaborator on GitHub.
+3. **Vercel** (Hobby plan: no team seats): share Preview links with the classmate; read logs on request.
+4. **Anthropic API key** with a monthly spend limit → Vercel env vars `LLM_PROVIDER=anthropic` +
+   `ANTHROPIC_API_KEY` (Production + Preview) → redeploy. Estimate: roughly $0.3–0.6 per 10-minute game.
+   Locally, the old `.env` line `LLM_MODE=mock` does nothing — use `LLM_PROVIDER`.
+5. Submit on Handshake (`docs/submission.md`). Optional: delete the old remote branches
+   `docs/teammate-handoff` and `feat/m1-sync`.
 
 ## Pitfalls for whoever continues
 

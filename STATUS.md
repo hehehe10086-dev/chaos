@@ -4,7 +4,7 @@ Spec: `CHAOS_MVP_BRIEF.md` · Plan: `PLAN.md` · Judgment calls: `DECISIONS.md` 
 · **Who does what next, and the plan to the deadline: `HANDOFF.md`** · Test plan: `TESTING.md`
 
 > 2026-10-08: development and testing are handed to a classmate; Yuqi keeps the repo, Vercel, keys and
-> the submission. Nothing has been pushed yet — every commit below is still only on Yuqi's laptop.
+> the submission. `mvp-caesar` is pushed to GitHub; the pull request into `main` is not merged yet.
 
 ## Summary
 
@@ -145,7 +145,7 @@ with a story picker.
 
 ## Needs Yuqi (owner-only — details in `HANDOFF.md`, section 1)
 
-1. **Push** the branch: `git push -u origin mvp-caesar` (all its commits are local).
+1. ~~Push the branch~~ (done 2026-10-08). Open the PR `mvp-caesar → main` — or let the classmate do it.
 2. **Invite the classmate** as a collaborator on GitHub.
 3. **Vercel** (Hobby plan: no team seats): share Preview links with the classmate; read logs on request.
 4. **Anthropic API key** with a monthly spend limit → Vercel env vars `LLM_PROVIDER=anthropic` +

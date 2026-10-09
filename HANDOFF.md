@@ -12,9 +12,9 @@ What to read: `STATUS.md` (what works, what is verified, known issues) · `TESTI
 
 The classmate cannot do these:
 
-1. **Push the branch.** Every MVP commit is still only on Yuqi's laptop:
-   `git push -u origin mvp-caesar`. Vercel then builds a Preview of the branch. Opening the pull request
-   `mvp-caesar → main` on GitHub (the push prints a link) can be left to the classmate.
+1. ~~Push the branch~~ — done 2026-10-08: `mvp-caesar` is on GitHub and Vercel builds a Preview of it.
+   Open the pull request `mvp-caesar → main` (Yuqi or the classmate):
+   https://github.com/hehehe10086-dev/chaos/pull/new/mvp-caesar
 2. **Invite the classmate on GitHub:** repo `hehehe10086-dev/chaos` → Settings → Collaborators → Add
    people (their GitHub username).
 3. **Vercel stays with Yuqi** (the free Hobby plan has no team seats). If a Preview link asks the classmate
@@ -54,7 +54,7 @@ token or the API key — real Redis and real AI are tested on the Vercel links.
 
 | By       | What                                                                                                  | Who                                |
 | -------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| now      | Section 1: push, invite, Vercel sharing, API key                                                      | Yuqi                               |
+| now      | Section 1: invite, Vercel sharing, API key (the branch is already pushed)                             | Yuqi                               |
 | 10/10    | Local testing: `TESTING.md` A–E; file bugs as GitHub issues                                           | classmate                          |
 | 10/12    | Open the PR; test its Vercel Preview on a laptop and a real phone (S, A–E, C5–C6); merge → production | classmate (Yuqi reviews if around) |
 | 10/18    | Real-AI playtests (F), prompt tuning, bug fixes                                                       | classmate                          |

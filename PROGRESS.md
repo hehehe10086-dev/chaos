@@ -2,7 +2,7 @@
 
 ## Current status
 
-Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). Since 2026-10-08 a classmate develops and tests — see `HANDOFF.md`. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
+Branch `mvp-caesar` (pushed 2026-10-08, not merged yet): the MVP "The Ides of March" from `CHAOS_MVP_BRIEF.md` — playable end to end on the mock LLM, plus all M5 stretch goals (mid-game takeover, Tab assist, voice input); 74 tests pass. No real LLM called yet (no key). Since 2026-10-08 a classmate develops and tests — see `HANDOFF.md`. `main` still has only the M1 sync sandbox (live at https://chaos-ten-hazel.vercel.app/).
 
 ## Decisions
 
@@ -14,7 +14,7 @@ Branch `mvp-caesar` (not pushed): the MVP "The Ides of March" from `CHAOS_MVP_BR
 
 ## In progress
 
-- Yuqi — owner-only steps in `HANDOFF.md` §1: push `mvp-caesar`, invite the classmate, share Vercel Previews, API key
+- Yuqi — owner-only steps in `HANDOFF.md` §1: invite the classmate, share Vercel Previews, API key (branch already pushed)
 - Classmate — from 2026-10-08: setup and local testing (`HANDOFF.md` §2, `TESTING.md`)
 
 ## Next (by priority)
@@ -37,7 +37,7 @@ prompt tuning → playtest with someone new → feature freeze 10/27 → submit 
 
 ## Log
 
-- 2026-10-08 Claude — handoff to a classmate: `HANDOFF.md` rewritten for a human teammate (owner-only steps, day one, dated plan), `TESTING.md` (manual test plan + bug template + log), `docs/submission.md` + `docs/art-list.md` (title, description, cover image brief). Nothing pushed yet.
+- 2026-10-08 Claude — handoff to a classmate: `HANDOFF.md` rewritten for a human teammate (owner-only steps, day one, dated plan), `TESTING.md` (manual test plan + bug template + log), `docs/submission.md` + `docs/art-list.md` (title, description, cover image brief). Pushed `mvp-caesar` to GitHub.
 - 2026-10-06 Claude (evening) — `npm start` verified (fixed: a malformed URL crashed it; added `start:offline`); phone-width pass (fixed lobby overflow, composer focus/placeholder, role card height); README run / API key / new scenario; OpenAI defaults → GPT-6 (+ reasoning-effort fix); M5: takeover with recap, Tab assist, voice input; fixed long era-voice rewrites being rejected and `tidyLine` dropping closing quotes. 74 tests.
 - 2026-10-06 Claude — MVP on `mvp-caesar`: scenario JSON + schema, timeline engine, AI agents + worker, LLM adapter (mock/Anthropic/OpenAI), lobby/game/ending UI; STATUS.md written. Yuqi now works solo; B-59 shelved for the Ides of March.
 - 2026-10-05 Claude — fixed Redis reads (hmget returns an array with automaticDeserialization off); CAS retries 10 with exponential backoff; Redis integration test.
